@@ -20,16 +20,29 @@
     <script type = "text/javascript"  src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
     <script type = "text/javascript"  src="https://cdn.datatables.net/plug-ins/1.10.15/dataRender/datetime.js"></script>
   </head>
-  <body>
-    <form action = "#"  method = "post">
-      <p>
-        <label for="Product Name">Product Search</label>
-        <input class= "form-control" placeholder="Enter product" name = "productEntry">
-        <small class="form-text text-muted">Enter the product to search or add</small>
-      </p>
-      <p>
-        <button type="submit" class="btn btn-primary">Submit</button>
-      </p>
-    </form>
-  </body>
+ <div class="card">
+      <div class="card-body">
+        <form action="#" method="post">
+          <p>Add Product:</p>
+          <p>
+            <label for="Product Name">Add product</label>
+            <input type="text" name="nm" />
+            <small class="form-text text-muted">Enter the product to add</small>
+          </p>
+          <p>
+            <label for="Product Name">Cost Price</label>
+            <input type="number" step="0.01" name="cp" />
+            <small class="form-text text-muted">How much does it cost you?</small>
+          </p>
+          <p>
+            <label for="Product Name">Sales Price</label>
+            <input type="number" step="0.01" name="sp" />
+            <small class="form-text text-muted">How much do you want to sell it for?</small>
+          </p>
+          <button class="btn btn-success mt-2">ADD ITEM</button>
+          
+        </form>
+      </div>
+  </div>
+
 </html>
