@@ -22,11 +22,11 @@ firebaseConfig = {
 
 firebase = pyrebase.initialize_app(firebaseConfig)
 db = firebase.database()
-
-db.child("Products").push({"name": "Thermometer", "costPrice": "10.50", "previousSalePrice": [15,20,15,16]})
-
 app = Flask(__name__)
 app.secret_key = "namanjain"
+
+
+
 # Route for handling the login page logic
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -40,21 +40,43 @@ def login():
 
 @app.route("/home", methods=['GET', 'POST'])
 def home():
-    if request.method == 'POST':
-        item = request.form["nm"]
-        session["item"] = item
-        print("postItem is" ,  item)
-        return redirect( url_for("itemPage") )
-    else:
-        return render_template('main.html')
 
-@app.route("/item")
-def itemPage():
-    if "item" in session:
-        item = session["item"]
-        return f"<h1>{item}</h1>"
+    data = db.child("Products").get()
+    if data:
+        data = data.val().values()
+    
+    if request.method == 'POST':
+        if request.form['submit'] == 'add':
+            item = request.form["nm"]
+            costPrice = request.form["cp"]
+            salesPrice = request.form["sp"]
+            if item and costPrice and salesPrice: # create item in db
+                db.child("Products").push(
+                    {"name": item,
+                    "costPrice": costPrice, 
+                    "previousSalePrice": [0,salesPrice]
+                    }
+                )
+                data = db.child("Products").get()
+                if data:
+                    data = data.val().values()
+
+            session["item"] = item
+            print("postItem is" ,  item)
+            return render_template('main.html', data = data )
+            # return redirect( url_for("itemPage") )
+        else:
+            return render_template('main.html', data = data )
     else:
-        redirect(url_for('home'))
+            return render_template('main.html', data = data )
+
+# @app.route("/item")
+# def itemPage():
+#     if "item" in session:
+#         item = session["item"]
+#         return f"<h1>{item}</h1>"
+#     else:
+#         redirect(url_for('home'))
 
 @app.route("/logout")
 def logout():
