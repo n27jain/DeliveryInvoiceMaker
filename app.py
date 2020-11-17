@@ -25,7 +25,7 @@ db = firebase.database()
 app = Flask(__name__)
 app.secret_key = "namanjain"
 data = None
-
+itemsList = []
 class Item:
     def __init__(self, key, name, costPrice, previousSalePrice , notes, quantity):
         self.key = key
@@ -60,7 +60,7 @@ def home():
     search = None # this will be the keyword we search by
 
     data = getData()
-    itemsList = []
+    global itemsList
 
     if request.method == 'POST':
         if (request.form['submit'] == 'add'):
