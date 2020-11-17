@@ -24,8 +24,13 @@ firebase = pyrebase.initialize_app(firebaseConfig)
 db = firebase.database()
 app = Flask(__name__)
 app.secret_key = "namanjain"
+data = None
 
 
+def getData():
+    data = None
+    data = db.child("Products").get()
+    return data
 
 # Route for handling the login page logic
 @app.route('/', methods=['GET', 'POST'])
@@ -41,12 +46,13 @@ def login():
 @app.route("/home", methods=['GET', 'POST'])
 def home():
 
-    data = db.child("Products").get()
-    if data:
-        data = data.val().values()
+    found = [] # this will be the list of found items in the database
+    search = None # this will be the keyword we search by
+
+    data = getData()
     
     if request.method == 'POST':
-        if request.form['submit'] == 'add':
+        if (request.form['submit'] == 'add'):
             item = request.form["nm"]
             costPrice = request.form["cp"]
             salesPrice = request.form["sp"]
@@ -57,16 +63,32 @@ def home():
                     "previousSalePrice": [0,salesPrice]
                     }
                 )
-                data = db.child("Products").get()
-                if data:
-                    data = data.val().values()
+                data = getData()
 
             session["item"] = item
             print("postItem is" ,  item)
             return render_template('main.html', data = data )
             # return redirect( url_for("itemPage") )
+
+        elif (request.form['submit'] == 'find'):
+            findnm = request.form["findnm"]
+            print("findnm is" , findnm)
+            # return findByKeyWord(findnm)
+            #return render_template('main.html', data = None )
+
+        elif (request.form['submit'] == 'remove'):
+            toDelete  = request.form["itemDelete"]
+            al = db.child("Products").child(toDelete).get()
+            al = al.val()
+            print("itemNameToDelete: ", toDelete)
+            print("finding :", al)
+            db.child("Products").child(toDelete).remove()
+            data = getData()
+            return render_template('main.html', data = data )
+
         else:
             return render_template('main.html', data = data )
+
     else:
             return render_template('main.html', data = data )
 
@@ -82,6 +104,13 @@ def home():
 def logout():
     session.pop("home", None)
     return redirect(url_for("login"))
+
+
+
+def findByKeyWord(word):
+    itemsByName = db.child("Products").order_by_child('name').get()
+    print(itemsByName)
+    return f"<h1>{itemsByName}</h1>"
 
 
 

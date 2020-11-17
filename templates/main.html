@@ -19,6 +19,12 @@
     <script type = "text/javascript"  src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
     <script type = "text/javascript"  src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
     <script type = "text/javascript"  src="https://cdn.datatables.net/plug-ins/1.10.15/dataRender/datetime.js"></script>
+    
+    <!-- Minus Button-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
   </head>
 
  <div class = "row">
@@ -29,9 +35,9 @@
         <form action="#" method="post">
           <h1>Find Product:</h1>
           <p>
-            <label for="Product Name">Add product</label>
+            <label for="Product Name">Find product</label>
             <input type="text" name="findnm" />
-            <small class="form-text text-muted">Enter the product to add</small>
+            <small class="form-text text-muted">Enter the product to search</small>
           </p>
           <p>
             <label for="Cost Price">Cost Price</label>
@@ -72,7 +78,7 @@
           </p>
           <p>
             <label for="Notes"> Notes (Optional) </label>
-            <input type="number" step="1" name="sp" />
+            <input type="text"  name="notes" />
             <small class="form-text text-muted">Did seller write the wrong product name?</small>
           </p>
           <button class="btn btn-success mt-2" name = "submit" value = "add" >ADD ITEM</button>
@@ -83,7 +89,7 @@
 
  </div>
 
-
+ <!-- Products added to List -->
   <table class = "table" style="width:80%">
     <thead>
       <tr>
@@ -94,14 +100,24 @@
       </tr>
     </thead>
     <tbody>
-      {% for i in data %}
-        <tr>
-        <th scope="row"> 1 </th>
-          <td>{{i.name}}</td>
-          <td>{{i.costPrice}}</td>
-          <td>{{i.previousSalePrice[-1]}}</td>
-        </tr>
+      {% if data != None %}
+        {% for i in data.each() %}
+          <tr>
+          <th scope="row"> 1 </th>
+            <td>{{i.val().name}}</td>
+            <td>{{i.val().costPrice}}</td>
+            <td>{{i.val().previousSalePrice[-1]}}</td>
+            <td>
+              <form action="#" method="post">
+                <input type="hidden" value="{{i.key()}}" name="itemDelete">
+                <button class="btn btn-info btn-lg" name = "submit" value = "remove">
+                  <span class="glyphicon glyphicon-minus-sign"></span> 
+                </a>
+              </form>
+            </td>
+          </tr>
         {% endfor %}
+      {% endif %}
     </tbody>
   </table> 
  
