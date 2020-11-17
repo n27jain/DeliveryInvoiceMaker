@@ -87,27 +87,26 @@ def home():
                 data = getData()
                 jsonVal = Item(varcheck, item, costPrice, salesPrice, notes, quantity)
                 itemsList.append(jsonVal)
-                print("LENGTH:" ,len(itemsList))
 
             session["item"] = item
-            print("postItem is" ,  item)
             return render_template('main.html', data = data , itemsList = itemsList )
             # return redirect( url_for("itemPage") )
 
         elif (request.form['submit'] == 'find'):
             findnm = request.form["findnm"]
-            print("findnm is" , findnm)
             # return findByKeyWord(findnm)
             #return render_template('main.html', data = None )
 
         elif (request.form['submit'] == 'remove'):
             toDelete  = request.form["itemDelete"]
-            al = db.child("Products").child(toDelete).get()
-            al = al.val()
-            print("itemNameToDelete: ", toDelete)
-            print("finding :", al)
-            db.child("Products").child(toDelete).remove()
-            data = getData()
+            # al = db.child("Products").child(toDelete).get()
+            # al = al.val()
+            # db.child("Products").child(toDelete).remove()
+            # data = getData()
+            for item in itemsList:
+                if item.key == toDelete:
+                    itemsList.remove(item)
+                    data = getData()
             return render_template('main.html', data = data, itemsList = itemsList)
 
         else:
