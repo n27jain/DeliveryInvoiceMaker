@@ -7,7 +7,7 @@ from flask import request
 from flask import session
 from flask import config
 
-
+import json
 
 firebaseConfig = {
     "apiKey": "AIzaSyDjRLpE5kpL82vkQbJB9wRJC6mP1iR6o7w",
@@ -66,7 +66,7 @@ def home():
         if (request.form['submit'] == 'add'):
 
             #mandatory
-            item = request.form["nm"]
+            name = request.form["nm"]
             costPrice = request.form["cp"]
             salesPrice = request.form["sp"]
             quantity = request.form["quantity"]
@@ -74,21 +74,19 @@ def home():
             notes = None
             notes = request.form["notes"]
 
-            if item and costPrice and salesPrice and quantity: # create item in db
-                varcheck = db.child("Products").push(
-                    {"name": item,
+            if name and costPrice and salesPrice and quantity: # create item in db
+                key = db.child("Products").push(
+                    {"name": name,
                     "costPrice": costPrice, 
                     "previousSalePrice": [0,salesPrice],
                     "notes": notes,
                     "quantity": quantity
                     }
                 )
-              
+                key = key["name"]
                 data = getData()
-                jsonVal = Item(varcheck, item, costPrice, salesPrice, notes, quantity)
+                jsonVal = Item(key, name, costPrice, salesPrice, notes, quantity)
                 itemsList.append(jsonVal)
-
-            session["item"] = item
             return render_template('main.html', data = data , itemsList = itemsList )
             # return redirect( url_for("itemPage") )
 
@@ -104,7 +102,7 @@ def home():
             # db.child("Products").child(toDelete).remove()
             # data = getData()
             for item in itemsList:
-                if item.key == toDelete:
+                if (item.key == toDelete):
                     itemsList.remove(item)
                     data = getData()
             return render_template('main.html', data = data, itemsList = itemsList)
