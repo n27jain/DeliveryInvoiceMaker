@@ -26,6 +26,16 @@ app = Flask(__name__)
 app.secret_key = "namanjain"
 data = None
 
+class Item:
+    def __init__(self, key, name, costPrice, previousSalePrice , notes, quantity):
+        self.key = key
+        self.name = name
+        self.costPrice = costPrice
+        self.previousSalePrice = previousSalePrice
+        self.notes = notes
+        self.quantity = quantity
+
+
 
 def getData():
     data = None
@@ -50,24 +60,38 @@ def home():
     search = None # this will be the keyword we search by
 
     data = getData()
-    
+    itemsList = []
+
     if request.method == 'POST':
         if (request.form['submit'] == 'add'):
+
+            #mandatory
             item = request.form["nm"]
             costPrice = request.form["cp"]
             salesPrice = request.form["sp"]
-            if item and costPrice and salesPrice: # create item in db
-                db.child("Products").push(
+            quantity = request.form["quantity"]
+            #optional 
+            notes = None
+            notes = request.form["notes"]
+
+            if item and costPrice and salesPrice and quantity: # create item in db
+                varcheck = db.child("Products").push(
                     {"name": item,
                     "costPrice": costPrice, 
-                    "previousSalePrice": [0,salesPrice]
+                    "previousSalePrice": [0,salesPrice],
+                    "notes": notes,
+                    "quantity": quantity
                     }
                 )
+              
                 data = getData()
+                jsonVal = Item(varcheck, item, costPrice, salesPrice, notes, quantity)
+                itemsList.append(jsonVal)
+                print("LENGTH:" ,len(itemsList))
 
             session["item"] = item
             print("postItem is" ,  item)
-            return render_template('main.html', data = data )
+            return render_template('main.html', data = data , itemsList = itemsList )
             # return redirect( url_for("itemPage") )
 
         elif (request.form['submit'] == 'find'):
@@ -84,21 +108,13 @@ def home():
             print("finding :", al)
             db.child("Products").child(toDelete).remove()
             data = getData()
-            return render_template('main.html', data = data )
+            return render_template('main.html', data = data, itemsList = itemsList)
 
         else:
-            return render_template('main.html', data = data )
+            return render_template('main.html', data = data, itemsList = itemsList )
 
     else:
-            return render_template('main.html', data = data )
-
-# @app.route("/item")
-# def itemPage():
-#     if "item" in session:
-#         item = session["item"]
-#         return f"<h1>{item}</h1>"
-#     else:
-#         redirect(url_for('home'))
+            return render_template('main.html', data = data, itemsList = itemsList )
 
 @app.route("/logout")
 def logout():

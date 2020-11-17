@@ -29,6 +29,7 @@
 
  <div class = "row">
 
+  <!-- Find product Form -->
   <div class="column">
     <div class="card">
       <div class="card-body">
@@ -51,6 +52,8 @@
     </div>
   </div>
 
+
+ <!-- Add a new product Form -->
   <div class="column">
     <div class="card">
       <div class="card-body">
@@ -73,7 +76,7 @@
           </p>
           <p>
             <label for="Quantity"> Quantity </label>
-            <input type="number" step="1" name="sp" />
+            <input type="number" step="1" name="quantity" />
             <small class="form-text text-muted">How many items are you selling?</small>
           </p>
           <p>
@@ -89,27 +92,31 @@
 
  </div>
 
- <!-- Products added to List -->
+ <!-- Products added to List Table -->
+
+ <div class="card">
   <table class = "table" style="width:80%">
     <thead>
       <tr>
-        <th scope="col">#</th>
         <th scope="col">Name</th>
         <th scope="col">Cost Price</th>
         <th scope="col">Sales Price</th>
+        <th scope="col">Quantity</th>
+         <th scope="col">Notes</th>
       </tr>
     </thead>
     <tbody>
-      {% if data != None %}
-        {% for i in data.each() %}
+      {% if itemsList != None %}
+        {% for i in itemsList %}
           <tr>
-          <th scope="row"> 1 </th>
-            <td>{{i.val().name}}</td>
-            <td>{{i.val().costPrice}}</td>
-            <td>{{i.val().previousSalePrice[-1]}}</td>
+            <td>{{i.name}}</td>
+            <td>{{i.costPrice}}</td>
+            <td>{{i.previousSalePrice[-1]}}</td>
+            <td>{{i.quantity}}</td>
+            <td>{{i.notes}}</td>
             <td>
               <form action="#" method="post">
-                <input type="hidden" value="{{i.key()}}" name="itemDelete">
+                <input type="hidden" value="{{i.key}}" name="itemDelete">
                 <button class="btn btn-info btn-lg" name = "submit" value = "remove">
                   <span class="glyphicon glyphicon-minus-sign"></span> 
                 </a>
@@ -119,7 +126,8 @@
         {% endfor %}
       {% endif %}
     </tbody>
+
   </table> 
- 
+ </div>
 
 </html>
