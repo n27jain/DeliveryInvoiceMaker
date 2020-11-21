@@ -1,11 +1,8 @@
 <html>
   <head>
-    <!-- Favicon -->
-    <!--link rel="shortcut icon" href="{{url_for('static', filename='images/favicon.ico')}}"-->
-
-    <!-- JQuery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    
     <!-- Bootstrap -->
     <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <script type = "text/javascript"  src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
@@ -126,8 +123,13 @@
         {% endfor %}
       {% endif %}
     </tbody>
+    
 
-  </table> 
+  </table>
+  <a href="/return-files/" target="blank">
+    <button class="btn btn-primary btn-lg btn-outline-success" style = "float: right;">Submit</button>
+  </a>
+
  </div>
 
 </html>

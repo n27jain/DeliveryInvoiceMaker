@@ -1,13 +1,18 @@
-import pyrebase
+
+from excelMaker import ExcelMaker
 from flask import Flask 
+from flask.helpers import send_file
 from flask import render_template
 from flask import redirect
 from flask import url_for
 from flask import request
 from flask import session
-from flask import config
 
-import json
+
+from decimal import Decimal
+
+
+import pyrebase
 
 firebaseConfig = {
     "apiKey": "AIzaSyDjRLpE5kpL82vkQbJB9wRJC6mP1iR6o7w",
@@ -20,12 +25,20 @@ firebaseConfig = {
     "measurementId": "G-7BKRLPKX63"
 }
 
+# global variables
 firebase = pyrebase.initialize_app(firebaseConfig)
 db = firebase.database()
 app = Flask(__name__)
 app.secret_key = "namanjain"
+
 data = None
 itemsList = []
+fileName = ""
+
+
+
+
+
 class Item:
     def __init__(self, key, name, costPrice, previousSalePrice , notes, quantity):
         self.key = key
@@ -67,9 +80,11 @@ def home():
 
             #mandatory
             name = request.form["nm"]
-            costPrice = request.form["cp"]
-            salesPrice = request.form["sp"]
-            quantity = request.form["quantity"]
+            costPrice = float(request.form["cp"])
+            salesPrice = float(request.form["sp"])
+            quantity = float(request.form["quantity"])
+            print("current data: ", costPrice, salesPrice, quantity)
+            print("finding types: ", type(costPrice))
             #optional 
             notes = None
             notes = request.form["notes"]
@@ -83,10 +98,12 @@ def home():
                     "quantity": quantity
                     }
                 )
+
                 key = key["name"]
                 data = getData()
                 jsonVal = Item(key, name, costPrice, salesPrice, notes, quantity)
                 itemsList.append(jsonVal)
+
             return render_template('main.html', data = data , itemsList = itemsList )
             # return redirect( url_for("itemPage") )
 
@@ -106,7 +123,6 @@ def home():
                     itemsList.remove(item)
                     data = getData()
             return render_template('main.html', data = data, itemsList = itemsList)
-
         else:
             return render_template('main.html', data = data, itemsList = itemsList )
 
@@ -118,14 +134,29 @@ def logout():
     session.pop("home", None)
     return redirect(url_for("login"))
 
-
-
 def findByKeyWord(word):
     itemsByName = db.child("Products").order_by_child('name').get()
     print(itemsByName)
     return f"<h1>{itemsByName}</h1>"
 
+def create(itemsList):
+    taxPercent = 0.13
+    maker = ExcelMaker("newFile", itemsList, taxPercent)
+    return None
 
+
+@app.route('/return-files/')
+def creareturn_files_tut():
+    global itemsList
+    global fileName
+    fileName = "sample"
+    try:
+        taxPercent = 0.13
+        mkr = ExcelMaker(title = fileName, items = itemsList, taxPercent= taxPercent)
+        filename = mkr.makeExcel()
+        return send_file(filename, attachment_filename= filename,  as_attachment=True )
+    except Exception as e:
+        return str(e)
 
 if __name__ == '__main__':
     app.run(debug=True)
