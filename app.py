@@ -1,7 +1,8 @@
 
 from excelMaker import ExcelMaker
 from flask import Flask 
-from flask.helpers import send_file
+from flask import flash
+from flask import send_file
 from flask import render_template
 from flask import redirect
 from flask import url_for
@@ -34,7 +35,7 @@ app.secret_key = "namanjain"
 data = None
 itemsList = []
 fileName = ""
-
+clientName = None
 
 
 
@@ -68,12 +69,18 @@ def login():
 
 @app.route("/home", methods=['GET', 'POST'])
 def home():
-
-    found = [] # this will be the list of found items in the database
-    search = None # this will be the keyword we search by
-
+    global clientName
+    isClientSelected = False
+    print(clientName)
+    
+    if(clientName != None ):
+        isClientSelected = True
+    
+    print(isClientSelected)
     data = getData()
     global itemsList
+    
+    
 
     if request.method == 'POST':
         if (request.form['submit'] == 'add'):
@@ -104,7 +111,7 @@ def home():
                 jsonVal = Item(key, name, costPrice, salesPrice, notes, quantity)
                 itemsList.append(jsonVal)
 
-            return render_template('main.html', data = data , itemsList = itemsList )
+            return render_template('main.html', data = data , itemsList = itemsList, isClientSelected = isClientSelected )
             # return redirect( url_for("itemPage") )
 
         elif (request.form['submit'] == 'find'):
@@ -122,12 +129,24 @@ def home():
                 if (item.key == toDelete):
                     itemsList.remove(item)
                     data = getData()
-            return render_template('main.html', data = data, itemsList = itemsList)
+            return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected )
+        
+        elif(request.form['submit'] == 'updateName'):
+            check = request.form["cname"]
+            if(isValidFileName(check)):
+                clientName = request.form["cname"]
+                isClientSelected = True
+            else:
+                flash('Invalid Filename: ' + check)
+            return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected )
+
+            
+
         else:
-            return render_template('main.html', data = data, itemsList = itemsList )
+            return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected )
 
     else:
-            return render_template('main.html', data = data, itemsList = itemsList )
+            return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected )
 
 @app.route("/logout")
 def logout():
@@ -157,6 +176,13 @@ def creareturn_files_tut():
         return send_file(filename, attachment_filename= filename,  as_attachment=True )
     except Exception as e:
         return str(e)
+
+
+def isValidFileName(name):
+    if all(x.isalpha() or x.isspace() for x in name):
+        return True
+    else:
+        return False
 
 if __name__ == '__main__':
     app.run(debug=True)
