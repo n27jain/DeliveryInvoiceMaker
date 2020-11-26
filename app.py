@@ -64,33 +64,42 @@ def home():
 
     if request.method == 'POST':
         if (request.form['submit'] == 'add'):
-
             #mandatory
+            # TODO: check with db to make sure name does not exist already 
             name = request.form["nm"]
-            costPrice = float(request.form["cp"])
-            salesPrice = float(request.form["sp"])
-            quantity = float(request.form["quantity"])
+            costPrice = (request.form["cp"])
+            salesPrice = (request.form["sp"])
+            quantity = (request.form["quantity"])
 
-            #optional 
-            notes = None
-            notes = request.form["notes"]
+            if name != '' and costPrice != '' and salesPrice != '' and quantity != '':
+                costPrice = float(costPrice)
+                salesPrice = float(salesPrice)
+                quantity = float(quantity)
+            
+                #optional 
+                notes = None
+                notes = request.form["notes"]
 
-            if name and costPrice and salesPrice and quantity: # create item in db
-                #TODO: Make sure to include this to add to the database
-                # key = db.child("Products").push(
-                #     {"name": name,
-                #     "costPrice": costPrice, 
-                #     "previousSalePrice": [0,salesPrice],
-                #     "notes": notes,
-                #     "quantity": quantity
-                #     }
-                # )
+                if quantity > 0 and salesPrice > 0: # create item in db
+                    #TODO: Make sure to include this to add to the database
+                    # key = db.child("Products").push(
+                    #     {"name": name,
+                    #     "costPrice": costPrice, 
+                    #     "previousSalePrice": [0,salesPrice],
+                    #     "notes": notes,
+                    #     "quantity": quantity
+                    #     }
+                    # )
 
-                # key = key["name"]
-                key = 100
-                data = getData()
-                jsonVal = Item(key, name, costPrice, salesPrice, notes, quantity)
-                itemsList.append(jsonVal)
+                    # key = key["name"]
+                    key = 100
+                    data = getData()
+                    jsonVal = Item(key, name, costPrice, salesPrice, notes, quantity)
+                    itemsList.append(jsonVal)
+                else:
+                    flash("Invaild Item")
+            else:
+                flash("Invaild Item")
 
             return render_template('main.html', data = data , 
             itemsList = itemsList, 
@@ -104,7 +113,7 @@ def home():
         elif (request.form['submit'] == 'remove'):
             toDelete  = request.form["itemDelete"]
             for item in itemsList:
-                if (item.key == toDelete):
+                if (item.name == toDelete):
                     itemsList.remove(item)
                     data = getData()
             return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected,  clientName = clientName  )
@@ -134,23 +143,34 @@ def findByKeyWord(word):
     return f"<h1>{itemsByName}</h1>"
 
 
-@app.route('/return-files/')
+@app.route('/return-files')
 def creareturn_files_tut():
     global itemsList
     global clientName
-    try: 
-        taxPercent = 0.13
-        ziped = FileHandler(clientName, itemsList, taxPercent)
-        file = ziped.addToZip()
-        os.remove(ziped.excelFileName)
-        os.remove(ziped.wordFileName)
-        os.remove(file)
-        return send_file(file, file,  as_attachment=True )
-        
+    try:
+        if len(itemsList) <= 0:
+            flash("The itemList was found to contain no items")
+        else:
+            taxPercent = 0.13
+            ziped = FileHandler(clientName, itemsList, taxPercent)
+            file = ziped.addToZip()
+            os.remove(ziped.excelFileName)
+            os.remove(ziped.wordFileName)
+            # os.remove(file)
+            itemsList = []
+            clientName = None
+            return send_file(file, file,  as_attachment=True )
         # return out
     except Exception as e:
         return str(e)
 
+@app.route('/change-client')
+def resetClientName():
+    global clientName
+    #reset clientName
+    clientName = None
+    return redirect(url_for('home'))
+    
 
 def isValidFileName(name):
     if all(x.isalpha() or x.isspace() or x.isnumeric() for x in name):
