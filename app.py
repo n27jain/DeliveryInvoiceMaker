@@ -1,5 +1,6 @@
 
 from FileHandler import FileHandler
+from Item import Item
 
 from flask import Flask 
 from flask import flash
@@ -10,11 +11,7 @@ from flask import url_for
 from flask import request
 from flask import session
 
-
-
-from decimal import Decimal
-
-
+import os
 import pyrebase
 
 firebaseConfig = {
@@ -31,32 +28,20 @@ firebaseConfig = {
 # global variables
 firebase = pyrebase.initialize_app(firebaseConfig)
 db = firebase.database()
-app = Flask(__name__)
-app.secret_key = "namanjain"
 
 data = None
 itemsList = []
 fileName = ""
 clientName = None
 
-
-class Item:
-    def __init__(self, key, name, costPrice, previousSalePrice , notes, quantity):
-        self.key = key
-        self.name = name
-        self.costPrice = costPrice
-        self.previousSalePrice = previousSalePrice
-        self.notes = notes
-        self.quantity = quantity
+app = Flask(__name__)
+app.secret_key = "namanjain"
 
 
 
-def getData():
-    data = None
-    data = db.child("Products").get()
-    return data
 
-# Route for handling the login page logic
+
+
 @app.route('/', methods=['GET', 'POST'])
 def login():
     error = None
@@ -153,15 +138,18 @@ def findByKeyWord(word):
 def creareturn_files_tut():
     global itemsList
     global clientName
-    # try:
-    taxPercent = 0.13
-    ziped = FileHandler(clientName, itemsList, taxPercent)
-    file = ziped.addToZip()
-    
-
-    return send_file(file, file,  as_attachment=True )
-    # except Exception as e:
-    #     return str(e)
+    try: 
+        taxPercent = 0.13
+        ziped = FileHandler(clientName, itemsList, taxPercent)
+        file = ziped.addToZip()
+        os.remove(ziped.excelFileName)
+        os.remove(ziped.wordFileName)
+        os.remove(file)
+        return send_file(file, file,  as_attachment=True )
+        
+        # return out
+    except Exception as e:
+        return str(e)
 
 
 def isValidFileName(name):
@@ -170,7 +158,10 @@ def isValidFileName(name):
     else:
         return False
 
-if __name__ == '__main__':
-    app.run(debug=True)
+def getData():
+    data = None
+    data = db.child("Products").get()
+    return data
+
 
 
