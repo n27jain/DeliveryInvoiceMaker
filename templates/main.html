@@ -24,6 +24,21 @@
 
   </head>
 
+{% if isClientSelected == True %}
+<h1> {{clientName}} </h1>
+
+{% endif %}
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
  <div class = "row">
   {% if isClientSelected == False %}
   <!-- Set Client Name -->
@@ -126,7 +141,7 @@
           <tr>
             <td>{{i.name}}</td>
             <td>{{i.costPrice}}</td>
-            <td>{{i.previousSalePrice[-1]}}</td>
+            <td>{{i.previousSalePrice}}</td>
             <td>{{i.quantity}}</td>
             <td>{{i.notes}}</td>
             <td>

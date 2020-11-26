@@ -1,5 +1,6 @@
 
-from excelMaker import ExcelMaker
+from FileHandler import FileHandler
+
 from flask import Flask 
 from flask import flash
 from flask import send_file
@@ -8,6 +9,7 @@ from flask import redirect
 from flask import url_for
 from flask import request
 from flask import session
+
 
 
 from decimal import Decimal
@@ -36,8 +38,6 @@ data = None
 itemsList = []
 fileName = ""
 clientName = None
-
-
 
 
 class Item:
@@ -70,17 +70,12 @@ def login():
 @app.route("/home", methods=['GET', 'POST'])
 def home():
     global clientName
+    global itemsList
+    data = getData()
     isClientSelected = False
-    print(clientName)
-    
+
     if(clientName != None ):
         isClientSelected = True
-    
-    print(isClientSelected)
-    data = getData()
-    global itemsList
-    
-    
 
     if request.method == 'POST':
         if (request.form['submit'] == 'add'):
@@ -90,46 +85,44 @@ def home():
             costPrice = float(request.form["cp"])
             salesPrice = float(request.form["sp"])
             quantity = float(request.form["quantity"])
-            print("current data: ", costPrice, salesPrice, quantity)
-            print("finding types: ", type(costPrice))
+
             #optional 
             notes = None
             notes = request.form["notes"]
 
             if name and costPrice and salesPrice and quantity: # create item in db
-                key = db.child("Products").push(
-                    {"name": name,
-                    "costPrice": costPrice, 
-                    "previousSalePrice": [0,salesPrice],
-                    "notes": notes,
-                    "quantity": quantity
-                    }
-                )
+                #TODO: Make sure to include this to add to the database
+                # key = db.child("Products").push(
+                #     {"name": name,
+                #     "costPrice": costPrice, 
+                #     "previousSalePrice": [0,salesPrice],
+                #     "notes": notes,
+                #     "quantity": quantity
+                #     }
+                # )
 
-                key = key["name"]
+                # key = key["name"]
+                key = 100
                 data = getData()
                 jsonVal = Item(key, name, costPrice, salesPrice, notes, quantity)
                 itemsList.append(jsonVal)
 
-            return render_template('main.html', data = data , itemsList = itemsList, isClientSelected = isClientSelected )
+            return render_template('main.html', data = data , 
+            itemsList = itemsList, 
+            isClientSelected = isClientSelected, 
+            clientName = clientName )
             # return redirect( url_for("itemPage") )
 
         elif (request.form['submit'] == 'find'):
             findnm = request.form["findnm"]
-            # return findByKeyWord(findnm)
-            #return render_template('main.html', data = None )
 
         elif (request.form['submit'] == 'remove'):
             toDelete  = request.form["itemDelete"]
-            # al = db.child("Products").child(toDelete).get()
-            # al = al.val()
-            # db.child("Products").child(toDelete).remove()
-            # data = getData()
             for item in itemsList:
                 if (item.key == toDelete):
                     itemsList.remove(item)
                     data = getData()
-            return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected )
+            return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected,  clientName = clientName  )
         
         elif(request.form['submit'] == 'updateName'):
             check = request.form["cname"]
@@ -138,15 +131,12 @@ def home():
                 isClientSelected = True
             else:
                 flash('Invalid Filename: ' + check)
-            return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected )
-
-            
+            return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected,  clientName = clientName )
 
         else:
-            return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected )
-
+            return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected,  clientName = clientName  )
     else:
-            return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected )
+        return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected,  clientName = clientName   )
 
 @app.route("/logout")
 def logout():
@@ -158,28 +148,24 @@ def findByKeyWord(word):
     print(itemsByName)
     return f"<h1>{itemsByName}</h1>"
 
-def create(itemsList):
-    taxPercent = 0.13
-    maker = ExcelMaker("newFile", itemsList, taxPercent)
-    return None
-
 
 @app.route('/return-files/')
 def creareturn_files_tut():
     global itemsList
-    global fileName
-    fileName = "sample"
-    try:
-        taxPercent = 0.13
-        mkr = ExcelMaker(title = fileName, items = itemsList, taxPercent= taxPercent)
-        filename = mkr.makeExcel()
-        return send_file(filename, attachment_filename= filename,  as_attachment=True )
-    except Exception as e:
-        return str(e)
+    global clientName
+    # try:
+    taxPercent = 0.13
+    ziped = FileHandler(clientName, itemsList, taxPercent)
+    file = ziped.addToZip()
+    
+
+    return send_file(file, file,  as_attachment=True )
+    # except Exception as e:
+    #     return str(e)
 
 
 def isValidFileName(name):
-    if all(x.isalpha() or x.isspace() for x in name):
+    if all(x.isalpha() or x.isspace() or x.isnumeric() for x in name):
         return True
     else:
         return False

@@ -16,10 +16,11 @@ class Item:
         
 
 class WordMaker:
-    def __init__(self, clientName, itemList):
+    def __init__(self, clientName, fileName, itemList, taxPercent):
+        self.taxPercent = taxPercent
         self.clientName = clientName
         self.itemList = itemList
-
+        self.fileName = fileName
         self.time = datetime.today()
         self.dateString = ""+ str( self.time.month) + "/"+ str( self.time.day) + "/" + str( self.time.year)
 
@@ -35,7 +36,6 @@ class WordMaker:
         self.makeHeader()
         self.makeData()
         self.makeFooter()
-        self.save()
 
     def makeHeader(self):
         header = self.section.header
@@ -181,8 +181,8 @@ class WordMaker:
         cell.text = str(total)
     
     def save(self):
-        self.document.save(self.clientName + str(self.time) + ".docx")
-
+        self.document.save(self.fileName + ".docx")
+        return (self.fileName + ".docx")
 
 
 
