@@ -5,12 +5,12 @@ from Item import Item
 from flask import Flask 
 from flask import flash
 from flask import send_file
-from flask import render_template
-from flask import redirect
-from flask import url_for
-from flask import request
+from flask import render_template, redirect, url_for
+from flask import request, make_response
 from flask import session
 
+
+import re
 import os
 import pyrebase
 
@@ -37,13 +37,17 @@ clientName = None
 app = Flask(__name__)
 app.secret_key = "namanjain"
 
-
+def stream_handler(message):
+    print(message["event"]) # put
+    print(message["path"]) # /-K7yGTTEp7O549EzTYtI
+    print(message["data"]) 
 
 
 
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
+    searchItems("haha")
     error = None
     if request.method == 'POST':
         if request.form['username'] != 'admin' or request.form['password'] != 'admin':
@@ -93,7 +97,7 @@ def home():
 
                     # key = key["name"]
                     key = 100
-                    data = getData()
+                    
                     jsonVal = Item(key, name, costPrice, salesPrice, notes, quantity)
                     itemsList.append(jsonVal)
                 else:
@@ -115,7 +119,7 @@ def home():
             for item in itemsList:
                 if (item.name == toDelete):
                     itemsList.remove(item)
-                    data = getData()
+                    
             return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected,  clientName = clientName  )
         
         elif(request.form['submit'] == 'updateName'):
@@ -159,7 +163,15 @@ def creareturn_files_tut():
             # os.remove(file)
             itemsList = []
             clientName = None
-            return send_file(file, file,  as_attachment=True )
+            response = make_response(send_file(file, file, as_attachment=True))
+
+            # remove cache for the file so that a new file can be sent each time
+            response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+            response.headers["Pragma"] = "no-cache"
+            response.headers["Expires"] = "0"
+            response.headers['Cache-Control'] = 'public, max-age=0'
+
+            return response
         # return out
     except Exception as e:
         return str(e)
@@ -167,6 +179,7 @@ def creareturn_files_tut():
 @app.route('/change-client')
 def resetClientName():
     global clientName
+
     #reset clientName
     clientName = None
     return redirect(url_for('home'))
@@ -183,5 +196,18 @@ def getData():
     data = db.child("Products").get()
     return data
 
+def searchItems(query):
+    varsing = re.search('tet', "TEST", re.IGNORECASE)
+    outList = []
+    # for item in data:
+    #     check = re.search(item.val().name, query, re.IGNORECASE)
 
+
+    # print("a =", varsing, "users = ", products  )
+    # if(query != None and isinstance(query, str) ):
+        
+    #     # for char in quer
+    # else:
+    #     return None
+    
 

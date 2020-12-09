@@ -24,6 +24,9 @@
 
   </head>
 
+  <a href="/logout" target="blank">
+        <button class="btn btn-primary btn-lg btn-outline-success" style = "float: right;">LogOut</button>
+  </a>
 {% if isClientSelected == True %}
 <div class = "row">
   <div class="column">
@@ -170,7 +173,7 @@
   </table>
 
   {% if itemsList|length > 0 %}
-    <a href="/return-files/" target="blank">
+    <a href="/return-files" target="blank">
       <button class="btn btn-primary btn-lg btn-outline-success" style = "float: right;">Submit</button>
     </a>
   {% else  %}
