@@ -1,1 +1,6 @@
-myapp/lib
+myapp/lib/
+myapp/app/__pycache__/
+.DS_Store
+.vscode/launch.json
+.vscode/settings.json
+myapp/.DS_Store
