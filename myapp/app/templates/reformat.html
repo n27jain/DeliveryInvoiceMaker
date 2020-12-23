@@ -1,8 +1,7 @@
 {% extends 'base.html' %}
 {% block title%} Make Invoice {%endblock%}
+
 {% block content%}
-
-
 <div class = "tablet">
     <div class = "row">
         <a href="/logout" target="blank">
@@ -38,15 +37,15 @@
             <div class="column">
                 <div class="card">
                     <div class="card-body">
-                    <form action="#" method="post">
-                        <h1>Client:</h1>
-                        <p>
-                        <label for="Product Name">Set Client Name :  </label>
-                        <input type="text" name="cname" />
-                        <small class="form-text text-muted"> Use less than 40 characters. Please use only alphabetical characters.  </small>
-                        </p>
-                        <button class="btn btn-success mt-2" name = "submit" value = "updateName">Choose this client</button>
-                    </form>
+                        <form action="#" method="post">
+                            <h1>Client:</h1>
+                            <p>
+                            <label for="Product Name">Set Client Name :  </label>
+                            <input type="text" name="cname" />
+                            <small class="form-text text-muted"> Use less than 40 characters. Please use only alphabetical characters.  </small>
+                            </p>
+                            <button class="btn btn-success mt-2" name = "submit" value = "updateName">Choose this client</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -110,22 +109,53 @@
                     </div>
                 </div>
             </div>
-    
-    
-    </div>
 
+            <div class="card">
+                <table class = "table" style="width:80%">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Cost Price</th>
+                            <th scope="col">Sales Price</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Notes</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% if itemsList != None or  itemsList|length > 0  %}
+                            {% for i in itemsList %}
+                                <tr>
+                                    <td>{{i.name}}</td>
+                                    <td>{{i.costPrice}}</td>
+                                    <td>{{i.previousSalePrice}}</td>
+                                    <td>{{i.quantity}}</td>
+                                    <td>{{i.notes}}</td>
+                                    <td>
+                                        <form action="#" method="post">
+                                            <input type="hidden" value="{{i.name}}" name="itemDelete">
+                                            <button class="btn btn-info btn-lg" name = "submit" value = "remove">
+                                            <span class="glyphicon glyphicon-minus-sign"></span> 
+                                            </a>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% endif %}
+                    </tbody>
+            
+
+                </table>
+            </div> <!--card-->
+            
+            {% if itemsList|length > 0 %}
+                <a href="/return-files" target="blank">
+                <button class="btn btn-primary btn-lg btn-outline-success" style = "float: right;">Submit</button>
+                </a>
+            {% else  %}
+                <a> Please add at least one item</a>
+            {% endif %}
         {% endif %}
-
-
-    </div>
-
-
-
-
-
-
-
-</div>
-
-
-{%endblock%}
+    </div><!-- End Row 35-->
+</div> <!-- tablet-->
+{%endblock%} <!-- Full block ends-->

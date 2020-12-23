@@ -1,48 +1,42 @@
- <!-- Products added to List Table -->
-
- <div class="card">
-  <table class = "table" style="width:80%">
-    <thead>
-      <tr>
-        <th scope="col">Name</th>
-        <th scope="col">Cost Price</th>
-        <th scope="col">Sales Price</th>
-        <th scope="col">Quantity</th>
-         <th scope="col">Notes</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% if itemsList != None or  itemsList|length > 0  %}
-        {% for i in itemsList %}
+ <div class="card" style = "padding: 50px;">
+  <table class = "table" >
+      <thead>
           <tr>
-            <td>{{i.name}}</td>
-            <td>{{i.costPrice}}</td>
-            <td>{{i.previousSalePrice}}</td>
-            <td>{{i.quantity}}</td>
-            <td>{{i.notes}}</td>
-            <td>
-              <form action="#" method="post">
-                <input type="hidden" value="{{i.name}}" name="itemDelete">
-                <button class="btn btn-info btn-lg" name = "submit" value = "remove">
-                  <span class="glyphicon glyphicon-minus-sign"></span> 
-                </a>
-              </form>
-            </td>
+              <th scope="col">Name</th>
+              <th scope="col">Cost Price</th>
+              <th scope="col">Sales Price</th>
+              <th scope="col">Quantity</th>
+              <th scope="col">Notes</th>
           </tr>
-        {% endfor %}
-      {% endif %}
-    </tbody>
-    
+      </thead>
 
+      <tbody>
+          {% if itemsList != None or  itemsList|length > 0  %}
+              {% for i in itemsList %}
+                  <tr>
+                      <td>{{i.name}}</td>
+                      <td>{{i.costPrice}}</td>
+                      <td>{{i.previousSalePrice}}</td>
+                      <td>{{i.quantity}}</td>
+                      <td>{{i.notes}}</td>
+                      <td>
+                          <form action="#" method="post">
+                              <input type="hidden" value="{{i.name}}" name="itemDelete">
+                              <button class="btn btn-info btn-lg" name = "submit" value = "remove">
+                              <span class="glyphicon glyphicon-minus-sign"></span> 
+                              </a>
+                          </form>
+                      </td>
+                  </tr>
+              {% endfor %}
+          {% endif %}
+      </tbody>
   </table>
-
-  {% if itemsList|length > 0 %}
-    <a href="/return-files" target="blank">
-      <button class="btn btn-primary btn-lg btn-outline-success" style = "float: right;">Submit</button>
-    </a>
-  {% else  %}
-   <a> Please add at least one item</a>
-  {% endif %}
-
- </div>
-{% endif %}
+    {% if itemsList|length > 0 %}
+        <a href="/return-files" target="blank">
+        <button class="btn btn-primary btn-lg btn-outline-success" style = "float: center; width : 100;">Submit</button>
+        </a>
+    {% else  %}
+        <a> Please add at least one item</a>
+    {% endif %}
+</div> <!--card-->
