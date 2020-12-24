@@ -11,21 +11,32 @@
     transition: 0.3s;
     border: 5px;
     flex: 1 100%;
+    left: 0;
+    right: 0;
+    margin: 25px;
 }
 
 .row_container_child  {
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
-    width: 100%;
-}
-.flex_child{
     
+    width: 100%;
 }
 
 .main_container container {
     display: flex;
     flex-direction: column;
+    margin: 50px;
+    padding: 50px;
+}
+.product_container{
+    left: 0;
+    right: 0;
+    padding: 20px;
+    background-color: rgba(128, 128, 128, 0.242);
+    bottom: 0px;
+    margin: 25px; 
+   
 }
 
 
