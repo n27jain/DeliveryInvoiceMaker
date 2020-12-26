@@ -1,7 +1,7 @@
  
  
  <h1 style = "margin-left: 45px ;"> Invoice </h1>
- <div class="card" style = "padding: 50px;">
+ <div class="card" style = "padding: 50px;"  name = "invoiceList">
   <table class = "table" >
       <thead>
           <tr>
@@ -14,7 +14,7 @@
       </thead>
 
       <tbody>
-          {% if itemsList != None or  itemsList|length > 0  %}
+          {% if itemsList != None and  itemsList|length > 0  %}
               {% for i in itemsList %}
                   <tr>
                       <td>{{i.name}}</td>
@@ -35,7 +35,7 @@
           {% endif %}
       </tbody>
   </table>
-    {% if itemsList|length > 0 %}
+    {% if  itemsList != None and itemsList|length > 0 %}
         <a href="/return-files" target="blank">
         <button class="btn btn-primary btn-lg btn-outline-success" style = "float: center; width : 100;">Submit</button>
         </a>

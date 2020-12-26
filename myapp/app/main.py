@@ -28,10 +28,10 @@ firebaseConfig = {
 firebase = pyrebase.initialize_app(firebaseConfig)
 db = firebase.database()
 
-allItemsInDB = []
 
 data = None
 itemsList = []
+foundData = [] # this is data found that is searched
 fileName = ""
 clientName = None
 
@@ -48,7 +48,6 @@ def stream_handler(message):
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
-    searchItems("haha")
     error = None
     if request.method == 'POST':
         if request.form['username'] != 'admin' or request.form['password'] != 'admin':
@@ -61,6 +60,7 @@ def login():
 def home():
     global clientName
     global itemsList
+    global foundData
     isClientSelected = False
 
     if(clientName != None ):
@@ -113,19 +113,68 @@ def home():
 
         elif (request.form['submit'] == 'find'):
             findnm = request.form["findnm"]
-            print(findnm)
-            searchItems(findnm)
+            foundData = searchItems(findnm)
+            return render_template('main.html', data = data, foundData = foundData, itemsList = itemsList, isClientSelected = isClientSelected,  clientName = clientName  )
+
+        elif (request.form['submit'] == 'add_update'):
+            #get form data
+            itemUpdateKey = request.form["itemUpdateKey"]
+            newName = request.form["newName"]
+            newCostPrice = request.form["newCostPrice"]
+            addNewSalesPrice = request.form["addNewSalesPrice"]
+            newQuantity = request.form["newQuantity"]
+            thisItem = None
+            hasChanged = False
+
+            #check for changes that are vaild and update Item
+            for item in foundData:
+                if item.key == itemUpdateKey:
+                    thisItem = item
+                    break
+
+            if thisItem:
+                if newName and newName != '' and newName != thisItem.name :
+                    thisItem.name = newName
+                    print("Changed because of name : ")
+                    hasChanged = True
+                if newCostPrice and newCostPrice != 0  and newCostPrice != thisItem.costPrice:
+                    thisItem.costPrice = newCostPrice
+                    hasChanged = True
+                    print("Changed because of costprice : ")
+                if addNewSalesPrice and addNewSalesPrice != 0 and addNewSalesPrice != thisItem.previousSalePrice[-1]:
+                    thisItem.previousSalePrice.append(addNewSalesPrice) 
+                    hasChanged = True
+                    print("Changed because of salesprice : ")
+                if newQuantity and newQuantity != 0 and newQuantity != thisItem.quantity:
+                    #TODO: Throw error if new Quantity is 0 
+                    thisItem.quantity = newQuantity
+                    hasChanged = True
+                    print("Changed because of quantity : ")
+
+                itemsList.append(thisItem) # add this to the list of items in the invoice
+
+            if(hasChanged):
+                #update db values
+                db.child("Products").child(itemUpdateKey).update(thisItem.createDBString())
+            
+            
             return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected,  clientName = clientName  )
+                
+
+
+            #flash("Invaild Item")
 
         elif (request.form['submit'] == 'remove'):
             toDelete  = request.form["itemDelete"]
             for item in itemsList:
                 if (item.name == toDelete):
                     itemsList.remove(item)
+                break
                     
             return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected,  clientName = clientName  )
         
-        elif(request.form['submit'] == 'updateName'):
+        elif(request.form['submit'] == 'updateClientName'):
+            itemsList = None
             check = request.form["cname"]
             if(isValidFileName(check)):
                 clientName = request.form["cname"]
@@ -198,48 +247,47 @@ def getData():
     global data
     data = None
     data = db.child("Products").get()
-    print(data)
+    # print(data)
 
 def searchItems(query):
     getData()
-
-    varsing = re.search('te', "TEST", re.IGNORECASE)
-
-    check = None # this var is used to peform a regular expression check
+    # parsing = re.search('te', "TEST", re.IGNORECASE)
+    
     listToShare = [] # this list contains all found products and their details
     temp_name = None
     temp_costPrice = None
     temp_salesPrice = None
     temp_quantity = None
+    isAll = False
+
+    if(query == None or query == ""):
+        return None
+    if(query == "*"): # master key to see all items in db
+        isAll = True
+
     for i in data.each():
         try:
             temp_name = i.val()["name"]
+            
             check = re.search( query, temp_name, re.IGNORECASE )
+            # print("NAME", temp_name)
+            if(check or (isAll and temp_name)): # it was found that this is a match to our query
+                temp_costPrice = (i.val()["costPrice"])
+
+                temp_salesPrice = (i.val()["previousSalePrice"])
+                temp_quantity = i.val()["quantity"]
+                notes = "Previous Sales Prices Were: " + str(i.val()["previousSalePrice"])
+                if i.val()["notes"]:
+                    notes = notes + " / " + i.val()["notes"]
+
+                key = i.key()
+                jsonVal = Item(key, temp_name, temp_costPrice, temp_salesPrice, notes, temp_quantity)
+                listToShare.append(jsonVal)
+                jsonVal.printItem()
         except:
             print("Found object dictionary has missing params") 
-        if(check): # it was found that this is a match to our query
-            temp_costPrice = (i.val()["costPrice"])
-            temp_salesPrice = (i.val()["previousSalePrice"])
-            notes = i.val()["previousSalePrice"]
-            jsonVal = Item(None, temp_name, temp_costPrice, temp_salesPrice, notes, None)
-            listToShare.append(jsonVal)
-    for item in listToShare:
-        print(item.printItem())
-    
-        # check = re.search( query, i.val().name, re.IGNORECASE )
-        # print("check", check)
-    
-    # outList = []
-    # for item in data:
-    #     check = re.search(item.val().name, query, re.IGNORECASE)
-
-
-    # print("a =", varsing, "users = ", products  )
-    # if(query != None and isinstance(query, str) ):
-        
-    #     # for char in quer
-    # else:
-    #     return None
+        print("DETAILS:" , (type(listToShare))  )
+    return listToShare
 
 
     
