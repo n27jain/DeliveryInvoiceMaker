@@ -174,7 +174,7 @@ def home():
             return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected,  clientName = clientName  )
         
         elif(request.form['submit'] == 'updateClientName'):
-            itemsList = None
+            itemsList = []
             check = request.form["cname"]
             if(isValidFileName(check)):
                 clientName = request.form["cname"]
