@@ -281,12 +281,12 @@ def searchItems(query):
                     notes = notes + " / " + i.val()["notes"]
 
                 key = i.key()
-                jsonVal = Item(key, temp_name, temp_costPrice, temp_salesPrice, notes, temp_quantity)
+                jsonVal = Item(key, temp_name, temp_costPrice, temp_salesPrice, i.val()["notes"], temp_quantity) # include the old note to prevent the temp note from overwriting
                 listToShare.append(jsonVal)
                 jsonVal.printItem()
         except:
             print("Found object dictionary has missing params") 
-        print("DETAILS:" , (type(listToShare))  )
+        
     return listToShare
 
 
