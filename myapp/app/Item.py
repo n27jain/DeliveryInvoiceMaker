@@ -6,3 +6,12 @@ class Item:
         self.previousSalePrice = previousSalePrice
         self.notes = notes
         self.quantity = quantity
+    def printItem(self):
+        print(
+            "key  :", self.key,
+            "name  :",self.name,
+            "costPrice  :",self.costPrice,
+            "previousSalePricevious  :",self.previousSalePrice,
+            "notes  :",self.notes,
+            "quantity  :",self.quantity
+        )

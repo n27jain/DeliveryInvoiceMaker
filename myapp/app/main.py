@@ -28,6 +28,8 @@ firebaseConfig = {
 firebase = pyrebase.initialize_app(firebaseConfig)
 db = firebase.database()
 
+allItemsInDB = []
+
 data = None
 itemsList = []
 fileName = ""
@@ -59,7 +61,6 @@ def login():
 def home():
     global clientName
     global itemsList
-    data = getData()
     isClientSelected = False
 
     if(clientName != None ):
@@ -112,6 +113,9 @@ def home():
 
         elif (request.form['submit'] == 'find'):
             findnm = request.form["findnm"]
+            print(findnm)
+            searchItems(findnm)
+            return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected,  clientName = clientName  )
 
         elif (request.form['submit'] == 'remove'):
             toDelete  = request.form["itemDelete"]
@@ -191,13 +195,41 @@ def isValidFileName(name):
         return False
 
 def getData():
+    global data
     data = None
     data = db.child("Products").get()
-    return data
+    print(data)
 
 def searchItems(query):
-    varsing = re.search('tet', "TEST", re.IGNORECASE)
-    outList = []
+    getData()
+
+    varsing = re.search('te', "TEST", re.IGNORECASE)
+
+    check = None # this var is used to peform a regular expression check
+    listToShare = [] # this list contains all found products and their details
+    temp_name = None
+    temp_costPrice = None
+    temp_salesPrice = None
+    temp_quantity = None
+    for i in data.each():
+        try:
+            temp_name = i.val()["name"]
+            check = re.search( query, temp_name, re.IGNORECASE )
+        except:
+            print("Found object dictionary has missing params") 
+        if(check): # it was found that this is a match to our query
+            temp_costPrice = (i.val()["costPrice"])
+            temp_salesPrice = (i.val()["previousSalePrice"])
+            notes = i.val()["previousSalePrice"]
+            jsonVal = Item(None, temp_name, temp_costPrice, temp_salesPrice, notes, None)
+            listToShare.append(jsonVal)
+    for item in listToShare:
+        print(item.printItem())
+    
+        # check = re.search( query, i.val().name, re.IGNORECASE )
+        # print("check", check)
+    
+    # outList = []
     # for item in data:
     #     check = re.search(item.val().name, query, re.IGNORECASE)
 
@@ -208,5 +240,7 @@ def searchItems(query):
     #     # for char in quer
     # else:
     #     return None
+
+
     
 
