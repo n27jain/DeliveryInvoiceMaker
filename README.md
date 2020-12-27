@@ -20,8 +20,12 @@ Since I am a shareholder of the company I made the decsion to make this open sou
   - [python-docx] (Library) used for making word document with details
   -[pyrebase] (Firebase Wrapper) This is a beautiful wrapper for using the Firebase API. Made queries suer easy
   
- 
- # Features
+## Features
+
+## Problems
+  - Heroku web hosting is giving us grief since v13. The current workaround is using pyinstaller to make an executable to share with the non-techincal people. Regular users can simply run the code to access the website locally.
+
+
  
 
 
