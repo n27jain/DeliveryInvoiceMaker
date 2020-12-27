@@ -28,8 +28,10 @@ firebaseConfig = {
 firebase = pyrebase.initialize_app(firebaseConfig)
 db = firebase.database()
 
+
 data = None
 itemsList = []
+foundData = [] # this is data found that is searched
 fileName = ""
 clientName = None
 
@@ -46,7 +48,6 @@ def stream_handler(message):
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
-    searchItems("haha")
     error = None
     if request.method == 'POST':
         if request.form['username'] != 'admin' or request.form['password'] != 'admin':
@@ -59,7 +60,7 @@ def login():
 def home():
     global clientName
     global itemsList
-    data = getData()
+    global foundData
     isClientSelected = False
 
     if(clientName != None ):
@@ -70,39 +71,40 @@ def home():
             #mandatory
             # TODO: check with db to make sure name does not exist already 
             name = request.form["nm"]
-            costPrice = (request.form["cp"])
-            salesPrice = (request.form["sp"])
-            quantity = (request.form["quantity"])
+            searchDB = searchItems(name, isExact = True)
+            if(searchDB): # we found a copy
+                flash("Item already exists in the database")
+            else:
+                costPrice = (request.form["cp"])
+                salesPrice = (request.form["sp"])
+                quantity = (request.form["quantity"])
 
-            if name != '' and costPrice != '' and salesPrice != '' and quantity != '':
-                costPrice = float(costPrice)
-                salesPrice = float(salesPrice)
-                quantity = float(quantity)
-            
-                #optional 
-                notes = None
-                notes = request.form["notes"]
+                if name != '' and costPrice != '' and salesPrice != '' and quantity != '':
+                    costPrice = float(costPrice)
+                    salesPrice = float(salesPrice)
+                    quantity = float(quantity)
+                
+                    #optional 
+                    notes = None
+                    notes = request.form["notes"]
 
-                if quantity > 0 and salesPrice > 0: # create item in db
-                    #TODO: Make sure to include this to add to the database
-                    # key = db.child("Products").push(
-                    #     {"name": name,
-                    #     "costPrice": costPrice, 
-                    #     "previousSalePrice": [0,salesPrice],
-                    #     "notes": notes,
-                    #     "quantity": quantity
-                    #     }
-                    # )
-
-                    # key = key["name"]
-                    key = 100
-                    
-                    jsonVal = Item(key, name, costPrice, salesPrice, notes, quantity)
-                    itemsList.append(jsonVal)
+                    if quantity > 0 and salesPrice > 0: # create item in db
+                        
+                        key = db.child("Products").push(
+                            {"name": name,
+                            "costPrice": costPrice, 
+                            "previousSalePrice": [0,salesPrice],
+                            "notes": notes,
+                            "quantity": quantity
+                            }
+                        )
+                        
+                        jsonVal = Item(key, name, costPrice, salesPrice, notes, quantity)
+                        itemsList.append(jsonVal)
+                    else:
+                        flash("Quantity and sales price must be larger than 0")
                 else:
                     flash("Invaild Item")
-            else:
-                flash("Invaild Item")
 
             return render_template('main.html', data = data , 
             itemsList = itemsList, 
@@ -112,16 +114,74 @@ def home():
 
         elif (request.form['submit'] == 'find'):
             findnm = request.form["findnm"]
+            foundData = searchItems(findnm)
+            return render_template('main.html', data = data, foundData = foundData, itemsList = itemsList, isClientSelected = isClientSelected,  clientName = clientName  )
+
+        elif (request.form['submit'] == 'add_update'):
+            #get form data
+            itemUpdateKey = request.form["itemUpdateKey"]
+            newName = request.form["newName"]
+            newCostPrice = (request.form["newCostPrice"])
+            addNewSalesPrice = (request.form["addNewSalesPrice"])
+            newQuantity = (request.form["newQuantity"])
+            if( not(itemUpdateKey and newName and newCostPrice and addNewSalesPrice and newQuantity)):
+                flash("There are some missing parameters")
+            else:
+                newCostPrice = float(newCostPrice)
+                addNewSalesPrice = float(addNewSalesPrice)
+                newQuantity = float(newQuantity)
+
+                thisItem = None
+                hasChanged = False
+
+                #check for changes that are vaild and update Item
+                for item in foundData:
+                    if item.key == itemUpdateKey:
+                        thisItem = item
+                        break
+
+                if thisItem:
+                    if( newName == ''):
+                        flash("name must not be empty")
+                    elif(newCostPrice <= 0 or addNewSalesPrice <=0 or newQuantity <= 0 ):
+                        flash("all values must be non null and must be greater than 0 ")
+                    else:
+                        if newName and newName != thisItem.name :
+                            thisItem.name = newName
+                            print("Changed because of name : ")
+                            hasChanged = True
+                        if newCostPrice and newCostPrice != thisItem.costPrice:
+                            thisItem.costPrice = newCostPrice
+                            hasChanged = True
+                            print("Changed because of costprice : ")
+                        if addNewSalesPrice and addNewSalesPrice != thisItem.previousSalePrice[-1]:
+                            thisItem.previousSalePrice.append(addNewSalesPrice) 
+                            hasChanged = True
+                            print("Changed because of salesprice : ")
+                        if newQuantity and newQuantity != thisItem.quantity:
+                            #TODO: Throw error if new Quantity is 0 
+                            thisItem.quantity = newQuantity
+                            hasChanged = True
+                            print("Changed because of quantity : ")
+
+                        itemsList.append(thisItem) # add this to the list of items in the invoice
+                        if(hasChanged):
+                            #update db values
+                            db.child("Products").child(itemUpdateKey).update(thisItem.createDBString())
+            return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected,  clientName = clientName  )
+                
 
         elif (request.form['submit'] == 'remove'):
             toDelete  = request.form["itemDelete"]
             for item in itemsList:
                 if (item.name == toDelete):
                     itemsList.remove(item)
+                break
                     
             return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected,  clientName = clientName  )
         
-        elif(request.form['submit'] == 'updateName'):
+        elif(request.form['submit'] == 'updateClientName'):
+            itemsList = []
             check = request.form["cname"]
             if(isValidFileName(check)):
                 clientName = request.form["cname"]
@@ -191,22 +251,53 @@ def isValidFileName(name):
         return False
 
 def getData():
+    global data
     data = None
     data = db.child("Products").get()
-    return data
+    # print(data)
 
-def searchItems(query):
-    varsing = re.search('tet', "TEST", re.IGNORECASE)
-    outList = []
-    # for item in data:
-    #     check = re.search(item.val().name, query, re.IGNORECASE)
+def searchItems(query, isExact = False):
+    getData()
+    # parsing = re.search('te', "TEST", re.IGNORECASE)
+    
+    listToShare = [] # this list contains all found products and their details
+    temp_name = None
+    temp_costPrice = None
+    temp_salesPrice = None
+    temp_quantity = None
+    isAll = False
 
+    if(query == None or query == ""):
+        return None
+    if(query == "*"): # master key to see all items in db
+        isAll = True
+    if(isExact):
+        for i in data.each():
+            if(i.val()["name"] == query ):
+                return True # this is used for adding a new item to the database. The if the new item we are adding exists in the db we will not add it.
+        return False;
+    for i in data.each():
+        try:
+            temp_name = i.val()["name"]
+            check = re.search( query, temp_name, re.IGNORECASE )
+            if(check or (isAll and temp_name)): # it was found that this is a match to our query
+                temp_costPrice = (i.val()["costPrice"])
 
-    # print("a =", varsing, "users = ", products  )
-    # if(query != None and isinstance(query, str) ):
+                temp_salesPrice = (i.val()["previousSalePrice"])
+                temp_quantity = i.val()["quantity"]
+                notes = "Previous Sales Prices Were: " + str(i.val()["previousSalePrice"])
+                if i.val()["notes"]:
+                    notes = notes + " / " + i.val()["notes"]
+
+                key = i.key()
+                jsonVal = Item(key, temp_name, temp_costPrice, temp_salesPrice, i.val()["notes"], temp_quantity) # include the old note to prevent the temp note from overwriting
+                listToShare.append(jsonVal)
+                jsonVal.printItem()
+        except:
+            print("Found object dictionary has missing params") 
         
-    #     # for char in quer
-    # else:
-    #     return None
+    return listToShare
+
+
     
 
