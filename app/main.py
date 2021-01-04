@@ -9,6 +9,7 @@ from flask import request, make_response
 from flask import session
 
 
+
 import re
 import os
 import pyrebase
@@ -33,10 +34,9 @@ data = None
 itemsList = []
 foundData = [] # this is data found that is searched
 fileName = ""
-clientName = None
 
 app = Flask(__name__)
-app.secret_key = "namanjain"
+app.secret_key = "projectSecretKey"
 
 def stream_handler(message):
     print(message["event"]) # put
@@ -58,13 +58,19 @@ def login():
 
 @app.route("/home", methods=['GET', 'POST'])
 def home():
-    global clientName
+    # global clientName
     global itemsList
     global foundData
     isClientSelected = False
-
-    if(clientName != None ):
-        isClientSelected = True
+    
+    clientName = None
+    if "clientName" in session:
+        print("SESSION FOUND")
+        if(session['clientName'] != None  or session['clientName'] != ""):
+            isClientSelected = True
+            clientName = session['clientName']
+    else:
+        clientName =  None
 
     if request.method == 'POST':
         if (request.form['submit'] == 'add'):
@@ -79,10 +85,11 @@ def home():
                 salesPrice = (request.form["sp"])
                 quantity = (request.form["quantity"])
 
+
                 if name != '' and costPrice != '' and salesPrice != '' and quantity != '':
-                    costPrice = float(costPrice)
-                    salesPrice = float(salesPrice)
-                    quantity = float(quantity)
+                    costPrice = int(costPrice)
+                    salesPrice = int(salesPrice)
+                    quantity = int(quantity)
                 
                     #optional 
                     notes = None
@@ -109,13 +116,13 @@ def home():
             return render_template('main.html', data = data , 
             itemsList = itemsList, 
             isClientSelected = isClientSelected, 
-            clientName = clientName )
+            clientName = session['clientName'] )
             # return redirect( url_for("itemPage") )
 
         elif (request.form['submit'] == 'find'):
             findnm = request.form["findnm"]
             foundData = searchItems(findnm)
-            return render_template('main.html', data = data, foundData = foundData, itemsList = itemsList, isClientSelected = isClientSelected,  clientName = clientName  )
+            return render_template('main.html', data = data, foundData = foundData, itemsList = itemsList, isClientSelected = isClientSelected,  clientName = clientName )
 
         elif (request.form['submit'] == 'add_update'):
             #get form data
@@ -127,9 +134,9 @@ def home():
             if( not(itemUpdateKey and newName and newCostPrice and addNewSalesPrice and newQuantity)):
                 flash("There are some missing parameters")
             else:
-                newCostPrice = float(newCostPrice)
-                addNewSalesPrice = float(addNewSalesPrice)
-                newQuantity = float(newQuantity)
+                newCostPrice = int(newCostPrice)
+                addNewSalesPrice = int(addNewSalesPrice)
+                newQuantity = int(newQuantity)
 
                 thisItem = None
                 hasChanged = False
@@ -168,7 +175,7 @@ def home():
                         if(hasChanged):
                             #update db values
                             db.child("Products").child(itemUpdateKey).update(thisItem.createDBString())
-            return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected,  clientName = clientName  )
+            return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected,  clientName = clientName )
                 
 
         elif (request.form['submit'] == 'remove'):
@@ -178,13 +185,15 @@ def home():
                     itemsList.remove(item)
                 break
                     
-            return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected,  clientName = clientName  )
+            return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected,  clientName = clientName )
         
         elif(request.form['submit'] == 'updateClientName'):
             itemsList = []
             check = request.form["cname"]
             if(isValidFileName(check)):
                 clientName = request.form["cname"]
+                session['clientName'] = request.form["cname"]
+
                 isClientSelected = True
             else:
                 flash('Invalid Filename: ' + check)
@@ -209,19 +218,18 @@ def findByKeyWord(word):
 @app.route('/return-files')
 def creareturn_files_tut():
     global itemsList
-    global clientName
     try:
         if len(itemsList) <= 0:
             flash("The itemList was found to contain no items")
         else:
             taxPercent = 0.13
-            ziped = FileHandler(clientName, itemsList, taxPercent)
+            ziped = FileHandler(session['clientName'], itemsList, taxPercent)
             file = ziped.addToZip()
             os.remove(ziped.excelFileName)
             os.remove(ziped.wordFileName)
             # os.remove(file)
             itemsList = []
-            clientName = None
+            session['clientName'] = None
             response = make_response(send_file(file, file, as_attachment=True))
 
             # remove cache for the file so that a new file can be sent each time
@@ -237,10 +245,9 @@ def creareturn_files_tut():
 
 @app.route('/change-client')
 def resetClientName():
-    global clientName
-
     #reset clientName
-    clientName = None
+
+    session.pop("clientName", None)
     return redirect(url_for('home'))
     
 
