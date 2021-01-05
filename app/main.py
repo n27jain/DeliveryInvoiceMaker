@@ -190,7 +190,7 @@ def home():
         elif(request.form['submit'] == 'updateClientName'):
             itemsList = []
             check = request.form["cname"]
-            if(isValidFileName(check)):
+            if(check and check != "" and isValidFileName(check)):
                 clientName = request.form["cname"]
                 session['clientName'] = request.form["cname"]
 

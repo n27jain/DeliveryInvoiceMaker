@@ -2,11 +2,12 @@
 {% block title%} Make Invoice {%endblock%}
 
 {% block content%}
-<div class = "main_container">
-
-    {%include "toolbar.html" %}
+{%include "toolbar.html" %}
+<div class = "wrap-all-modules">
+    <div class = "row row_container_child">
+      {%include "message_flashing.html" %}
+    </div>
     
-    {%include "message_flashing.html" %}
     
     {% if isClientSelected == False %}
       <div class = "row justify-content-center align-items-center"  >
@@ -16,7 +17,7 @@
 
     {% if isClientSelected == True %}
       
-          <div >
+          <div>
             {%include "find_products.html" %}
           </div>
           <!-- Add a new product Form -->

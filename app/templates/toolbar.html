@@ -1,27 +1,66 @@
-<nav class="navbar   navbar-expand-lg navbar-light bg-dark">
-  {% if isClientSelected == True %}
+ <nav class="main-nav">
+    <ul class="nav ml-auto">
+        <li>
+          {% if isClientSelected == True %}
+            <span class="navbar-text" style= "color:white; font-size: 1.8em !important;">
+              {{clientName}}  
+            </span>
+          {% endif %}
+        </li>
+
+        {% if isClientSelected == True %}
+          <li class="nav-item">
+            <a href="/change-client" target="blank">
+                <button class="login100-form-btn" >Change Client</button>
+            </a>
+          </li>
+        {% endif %}
+
+        <li class="nav-item">
+          <a href="/logout" target="blank" style = "margin-left:10px; margin-right:10px; ">
+              <button class="login100-form-btn" >LogOut</button>
+          </a>
+        </li>
+    </ul>
+</nav>
+
+
+
+
+
+
+<!--
+{% if isClientSelected == True %}
     <span class="navbar-text" style= "color:white; font-size: 1.8em !important;">
         {{clientName}}  
     </span>
-  {% endif %}
+{% endif %}
+
+-->
+
+<!--
+<nav>
+  
     
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav">
-
+  
     {% if isClientSelected == True %}
       <li class="nav-item">
         <a href="/change-client" target="blank">
-            <button class="btn btn-primary btn-lg btn-outline-success" >Change Client</button>
-        </a></li>
+            <button class="btn btn-primary btn-lg btn-outline-success button-navbar-color" >Change Client</button>
+        </a>
+      </li>
     {% endif %}
+    
       <li class="nav-item">
          <a href="/logout" target="blank" style = "margin-left:10px; margin-right:10px; ">
-            <button class="btn btn-primary btn-lg btn-outline-success" >LogOut</button>
+            <button class="btn btn-primary btn-lg btn-outline-success " >LogOut</button>
         </a>
       </li>
     </ul>
+  
+
   </div>
 </nav>
+-->
