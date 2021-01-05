@@ -29,17 +29,113 @@
     margin: 50px;
     padding: 50px;
 }
-.product_container{
-    left: 0;
-    right: 0;
+
+.navbar-color {
+    width: 100%;  
+    min-height: 100vh;
+   
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    background-color: #000000;
+    /* background: -webkit-linear-gradient(-135deg, #c850c0, #4158d0);
+    background: -o-linear-gradient(-135deg, #c850c0, #4158d0);
+    background: -moz-linear-gradient(-135deg, #c850c0, #4158d0);
+    background: linear-gradient(-135deg, #c850c0, #4158d0); */
+  }
+
+
+
+  .wrap-all-modules {
+    width: 80%;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+  
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 50px 130px 33px 95px;
+  }
+
+  .product_container{
+    width: 100%;
     padding: 20px;
+
+    overflow: hidden;
+  
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
     background-color: rgba(128, 128, 128, 0.242);
-    bottom: 0px;
+    border-radius: 10px;
     margin: 25px; 
+
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    transition: 0.3s;
+    border: 5px;
+    margin: 25px;
    
 }
 
+.list_of_found_items_container{
+    width: 100%;
+    padding: 20px;
 
-/* a{
-    font-size: larger;
-} */
+    overflow: hidden;
+  
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    background-color: rgba(128, 128, 128, 0.242);
+    border-radius: 10px;
+    margin: 25px; 
+
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    transition: 0.3s;
+    border: 5px;
+    margin: 25px;
+   
+}
+
+.input100ForText {
+    font-family: Poppins-Medium;
+    font-size: small;
+    background-color: #ffffff; 
+    color: black;
+    width: fit-content;
+    padding-left: 3px;
+    width: 100%;
+   
+  }
+.custom_navbar{
+    width: 100%;  
+    min-height: 100vh;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    background: #c850c0;
+    background: -webkit-linear-gradient(-135deg, #c850c0, #4158d0);
+    background: -o-linear-gradient(-135deg, #c850c0, #4158d0);
+    background: -moz-linear-gradient(-135deg, #c850c0, #4158d0);
+    background: linear-gradient(-135deg, #c850c0, #4158d0);
+}

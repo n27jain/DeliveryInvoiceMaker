@@ -1,7 +1,7 @@
  
  
  <h1 style = "margin-left: 45px ;"> Found Items: </h1>
- <div class="card" style = "padding: 50px;">
+ <div class="list_of_found_items_container">
   <table class = "table" >
       <thead>
           <tr>
@@ -19,19 +19,19 @@
                   <tr>
                     <form action="#" method="post">
                       <td>
-                        <input type="text" name="newName" value = "{{i.name}}" />
+                        <input class="input100ForText " type="text" name="newName" value = "{{i.name}}" />
                       </td>
 
                       <td>
-                        <input type="number" step="0.01" name="newCostPrice" value = {{i.costPrice}} />
+                        <input class="input100ForText " type="number" step="0.01" name="newCostPrice" value = {{i.costPrice}} />
                       </td>
 
                       <td>
-                        <input type="number" step="0.01" name="addNewSalesPrice" value = {{i.previousSalePrice[-1]}}  />
+                        <input class="input100ForText " type="number" step="0.01" name="addNewSalesPrice" value = {{i.previousSalePrice[-1]}}  />
                       </td>
 
                       <td>
-                        <input type="number" step="0.01" name="newQuantity" value = {{i.quantity}} onfocus="this.value=''"/>
+                        <input class="input100ForText " type="number" step="0.01" name="newQuantity" value = {{i.quantity}} onfocus="this.value=''"/>
                       </td>
 
                       <td>
@@ -43,7 +43,7 @@
 
                       <td>
                         <input type="hidden" value="{{i.key}}" name="itemUpdateKey">
-                        <button class="btn btn-info btn-lg" name = "submit" value = "add_update">
+                        <button class="login100-form-btn" name = "submit" value = "add_update">
                             ADD/UPDATE
                         </button>
                         </a>
