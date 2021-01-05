@@ -139,3 +139,8 @@
     background: -moz-linear-gradient(-135deg, #c850c0, #4158d0);
     background: linear-gradient(-135deg, #c850c0, #4158d0);
 }
+
+.main-nav{
+    background-color: #000000;
+    width: 100%;
+}
