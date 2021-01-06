@@ -18,7 +18,7 @@ class FileHandler:
         self.personalFile = "PERSONAL_" + self.clientName + str(self.time)
 
         self.excelFileName = self.makeExcel()
-        self.wordFileName = self.makeWord()
+        self.wordFileName, self.pdfFileName = self.makeWord()
     
     def makeExcel(self):
         mkr = ExcelMaker(clientName = self.clientName, fileName= self.clientFileName, items = self.itemsList, taxPercent= self.taxPercent)
@@ -34,8 +34,8 @@ class FileHandler:
 
     def addToZip(self):
         zip = ZipFile("app/"+ self.clientFileName + ".zip", 'w')
-        zip.write(self.excelFileName);
+        zip.write(self.excelFileName)
         zip.write(self.wordFileName)
+        zip.write(self.pdfFileName)
         zip.close()
-        print("excelFileName wordFileName",self.excelFileName, self.wordFileName )
         return ( self.clientFileName + ".zip")

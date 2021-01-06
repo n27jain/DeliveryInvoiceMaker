@@ -191,11 +191,17 @@ class WordMaker:
         cell.text = str(total)
     
     def save(self):
-        self.document.save("app/"+ self.fileName + ".docx")
-        convert("app/"+ self.fileName + ".docx")
-        wordName = "app/"+ self.fileName + ".docx" 
-        pdfName = "app/" + self.fileName + ".pdf"
-        return (wordName, pdfName)
+        self.document.save(self.fileName + ".docx")
+
+        convert(self.fileName + ".docx")
+        return (self.fileName + ".docx")
 
 
-
+item = Item("sdfsdf", "name", 10, 100 , "es", 1000)
+listItem = []
+listItem.append(item)
+wordFile = WordMaker(clientName = "Naman", 
+fileName = "naman", 
+itemList = listItem, 
+taxPercent = 0.13 )
+print (wordFile.save())

@@ -227,6 +227,7 @@ def creareturn_files_tut():
             file = ziped.addToZip()
             os.remove(ziped.excelFileName)
             os.remove(ziped.wordFileName)
+            os.remove(ziped.pdfFileName)
             # os.remove(file)
             itemsList = []
             session['clientName'] = None
