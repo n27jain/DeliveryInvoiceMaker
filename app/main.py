@@ -54,6 +54,8 @@ def login():
             error = 'Invalid Credentials. Please try again.'
         else:
             return redirect(url_for('home'))
+    # if "username" in session:
+
     return render_template('login.html', error=error)
 
 @app.route("/home", methods=['GET', 'POST'])
@@ -61,16 +63,15 @@ def home():
     # global clientName
     global itemsList
     global foundData
-    isClientSelected = False
     
     clientName = None
     if "clientName" in session:
-        print("SESSION FOUND")
+        
         if(session['clientName'] != None  or session['clientName'] != ""):
-            isClientSelected = True
             clientName = session['clientName']
     else:
-        clientName =  None
+        # we have an issue since client name is not defined. send user to set client
+        return redirect(url_for('changeClient'))
 
     if request.method == 'POST':
         if (request.form['submit'] == 'add'):
@@ -106,7 +107,7 @@ def home():
                             }
                         )
                         
-                        jsonVal = Item(key, name, costPrice, salesPrice, notes, quantity)
+                        jsonVal = Item(key, name, costPrice, [0,salesPrice], notes, quantity)
                         itemsList.append(jsonVal)
                     else:
                         flash("Quantity and sales price must be larger than 0")
@@ -115,17 +116,17 @@ def home():
 
             return render_template('main.html', data = data , 
             itemsList = itemsList, 
-            isClientSelected = isClientSelected, 
+             
             clientName = session['clientName'] )
             # return redirect( url_for("itemPage") )
 
         elif (request.form['submit'] == 'find'):
             findnm = request.form["findnm"]
             foundData = searchItems(findnm)
-            return render_template('main.html', data = data, foundData = foundData, itemsList = itemsList, isClientSelected = isClientSelected,  clientName = clientName )
+            return render_template('main.html', data = data, foundData = foundData, itemsList = itemsList,   clientName = clientName )
 
         elif (request.form['submit'] == 'add_update'):
-            #get form data
+            # get form data
             itemUpdateKey = request.form["itemUpdateKey"]
             newName = request.form["newName"]
             newCostPrice = (request.form["newCostPrice"])
@@ -175,7 +176,7 @@ def home():
                         if(hasChanged):
                             #update db values
                             db.child("Products").child(itemUpdateKey).update(thisItem.createDBString())
-            return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected,  clientName = clientName )
+            return render_template('main.html', data = data, itemsList = itemsList,  clientName = clientName )
                 
 
         elif (request.form['submit'] == 'remove'):
@@ -185,7 +186,7 @@ def home():
                     itemsList.remove(item)
                 break
                     
-            return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected,  clientName = clientName )
+            return render_template('main.html', data = data, itemsList = itemsList,  clientName = clientName )
         
         elif(request.form['submit'] == 'updateClientName'):
             itemsList = []
@@ -197,33 +198,52 @@ def home():
                 isClientSelected = True
             else:
                 flash('Invalid Filename: ' + check)
-            return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected,  clientName = clientName )
+            return render_template('main.html', data = data, itemsList = itemsList,  clientName = clientName )
 
         else:
-            return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected,  clientName = clientName  )
+            return render_template('main.html', data = data, itemsList = itemsList,  clientName = clientName  )
     else:
-        return render_template('main.html', data = data, itemsList = itemsList, isClientSelected = isClientSelected,  clientName = clientName   )
+        return render_template('main.html', data = data, itemsList = itemsList,  clientName = clientName   )
+
+
+@app.route("/changeClient", methods=['GET', 'POST'])
+def changeClient():
+    if "clientName" in session:
+        
+        if(session['clientName'] != None  or session['clientName'] != ""):
+            return redirect(url_for('home'))
+    if request.method == 'POST':
+        if(request.form['submit'] == 'updateClientName'):
+            global itemsList # empty the global list of items TODO: Make this in session as well
+            itemsList = []
+            check = request.form["cname"]
+            if(check and check != "" and isValidFileName(check)):
+                session['clientName'] = check
+                return redirect(url_for('home'))
+            else:
+                flash('Invalid Filename: ' + check)
+
+    return render_template('choseClientPage.html')
+
+
+
 
 @app.route("/logout")
 def logout():
     session.pop("home", None)
     return redirect(url_for("login"))
 
-def findByKeyWord(word):
-    itemsByName = db.child("Products").order_by_child('name').get()
-    print(itemsByName)
-    return f"<h1>{itemsByName}</h1>"
-
-
 @app.route('/return-files')
 def creareturn_files_tut():
     global itemsList
+    print("Testing data : ", itemsList)
     try:
         if len(itemsList) <= 0:
             flash("The itemList was found to contain no items")
         else:
             taxPercent = 0.13
             ziped = FileHandler(session['clientName'], itemsList, taxPercent)
+            
             file = ziped.addToZip()
             os.remove(ziped.excelFileName)
             os.remove(ziped.wordFileName)
@@ -250,7 +270,6 @@ def resetClientName():
     session.pop("clientName", None)
     return redirect(url_for('home'))
     
-
 def isValidFileName(name):
     if all(x.isalpha() or x.isspace() or x.isnumeric() for x in name):
         return True
@@ -292,9 +311,9 @@ def searchItems(query, isExact = False):
 
                 temp_salesPrice = (i.val()["previousSalePrice"])
                 temp_quantity = i.val()["quantity"]
-                notes = "Previous Sales Prices Were: " + str(i.val()["previousSalePrice"])
-                if i.val()["notes"]:
-                    notes = notes + " / " + i.val()["notes"]
+                #notes = "Previous Sales Prices Were: " + str(i.val()["previousSalePrice"])
+                # if i.val()["notes"]:
+                #     notes = notes + " / " + i.val()["notes"]
 
                 key = i.key()
                 jsonVal = Item(key, temp_name, temp_costPrice, temp_salesPrice, i.val()["notes"], temp_quantity) # include the old note to prevent the temp note from overwriting

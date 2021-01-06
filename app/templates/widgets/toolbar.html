@@ -1,14 +1,14 @@
  <nav class="main-nav">
     <ul class="nav ml-auto">
         <li>
-          {% if isClientSelected == True %}
+          {% if "clientName" in session %}
             <span class="navbar-text" style= "color:white; font-size: 1.8em !important;">
               {{clientName}}  
             </span>
           {% endif %}
         </li>
 
-        {% if isClientSelected == True %}
+        {% if "clientName" in session %}
           <li class="nav-item">
             <a href="/change-client" target="blank">
                 <button class="login100-form-btn" >Change Client</button>
@@ -29,38 +29,4 @@
 
 
 
-<!--
-{% if isClientSelected == True %}
-    <span class="navbar-text" style= "color:white; font-size: 1.8em !important;">
-        {{clientName}}  
-    </span>
-{% endif %}
 
--->
-
-<!--
-<nav>
-  
-    
-  <div class="collapse navbar-collapse" id="navbarNav">
-    <ul class="navbar-nav">
-  
-    {% if isClientSelected == True %}
-      <li class="nav-item">
-        <a href="/change-client" target="blank">
-            <button class="btn btn-primary btn-lg btn-outline-success button-navbar-color" >Change Client</button>
-        </a>
-      </li>
-    {% endif %}
-    
-      <li class="nav-item">
-         <a href="/logout" target="blank" style = "margin-left:10px; margin-right:10px; ">
-            <button class="btn btn-primary btn-lg btn-outline-success " >LogOut</button>
-        </a>
-      </li>
-    </ul>
-  
-
-  </div>
-</nav>
--->

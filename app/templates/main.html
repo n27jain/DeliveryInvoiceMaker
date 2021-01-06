@@ -2,19 +2,12 @@
 {% block title%} Make Invoice {%endblock%}
 
 {% block content%}
-{%include "widgets/toolbar.html" %}
 
 <div class = "wrap-all-modules">
     
     {%include "message_flashing.html" %}
 
-    {% if isClientSelected == False %}
-      
-      {%include "widgets/set_client.html" %}
-      
-    {% endif %}
-
-    {% if isClientSelected == True %}
+    {% if "clientName" in session %}
       
           <div>
             {%include "widgets/find_products.html" %}

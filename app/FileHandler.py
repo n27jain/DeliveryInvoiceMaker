@@ -10,7 +10,7 @@ class FileHandler:
         self.taxPercent = taxPercent
 
         self.time = datetime.today()
-        print(self.time)
+        print("Testing data : ", clientName, itemsList, taxPercent, self.time)
 
         self.dateString = ""+ str( self.time.month) + "/"+ str( self.time.day) + "/" + str( self.time.year)
 

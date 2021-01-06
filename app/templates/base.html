@@ -30,9 +30,12 @@
     
 
     <body>
-        <div class="container-login100">
-            {%block content%}
-            {%endblock%}
+        <div class = "viewContainer">
+            {%include "widgets/toolbar.html" %}
+            <div class="container-login100">
+                {%block content%}
+                {%endblock%}
+            </div>
         </div>
     </body>
 

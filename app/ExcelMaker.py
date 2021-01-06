@@ -17,7 +17,7 @@ class ExcelMaker:
     def calTotal(self):
         self.subTotal = 0 
         for item in self.items:
-            self.subTotal += item.quantity * item.previousSalePrice
+            self.subTotal += item.quantity * item.previousSalePrice[-1]
         self.hst =  self.subTotal * self.taxPercent
         self.total = self.subTotal + self.hst
         # print(self.total)

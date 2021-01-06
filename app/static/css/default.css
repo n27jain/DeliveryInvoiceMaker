@@ -7,13 +7,12 @@
 }
 
 .card {
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.8);
     transition: 0.3s;
     border: 5px;
-    flex: 1 100%;
-    left: 0;
-    right: 0;
-    margin: 25px;
+    padding: 40px;
+    
+    
 }
 
 .row_container_child  {
@@ -48,11 +47,11 @@
 
 
   .wrap-all-modules {
-    width: 80%;
-    background: #fff;
+    width:fit-content;
+    background: rgb(255, 255, 255);
     border-radius: 10px;
     overflow: hidden;
-  
+    margin: 20px;
     display: -webkit-box;
     display: -webkit-flex;
     display: -moz-box;
@@ -124,8 +123,12 @@
 
 
 .main-nav{
-    background-color: #000000;
-    width: 100%;
-    margin-bottom: 30px;
+    display:inline-block;
+    background-color: #000000ca;
+    width: 90%;
+    margin-bottom: 10px;
+    margin-left: 5%;
     border-radius: 10px;
+    display: flex;
+    align-items: flex-end;
 }
