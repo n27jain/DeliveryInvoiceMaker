@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title%} Change Header{%endblock%}
+
+{% block content%}
+
+<div class ="card" style = "width : 70%">
+    <form class="login100-form validate-form" style = "width : 100%" action="#" method="post">
+        <div class="wrap-input100 validate-input">	
+            <label for="companyName">Company Name :  </label>
+            <input class="input100" type="text" name="companyName" value = "{{companyName}}"/>
+        </div>
+        <div class="wrap-input100 validate-input">	
+            <label for="companyAddress">Company Address :  </label>
+            <input class="input100" type="text" name="companyAddress" value = "{{companyAddress}}" />
+        </div>
+        <div class="wrap-input100 validate-input">	
+            <label for="companyTel">Tel :  </label>
+            <input class="input100" type="tel" name="companyTel" value = "{{companyTel}}" />
+
+        </div>
+        <div class="wrap-input100 validate-input">	
+            <label for="companyFax">Fax :  </label>
+            <input class="input100" type="tel" name="companyFax" value = "{{companyFax}}" />
+
+        </div>
+        <div class="wrap-input100 validate-input">	
+            <label for="companyEmail">E-mail :  </label>
+            <input class="input100" type="email" name="companyEmail" value = "{{companyEmail}}" />
+
+        </div>
+        <div class="wrap-input100 validate-input">	
+            <label for="companyNote">Note :  </label>
+            <input class="input100" type="text" name="companyNote" value = "{{companyNote}}" />
+
+        </div>
+
+        <div class="container-login100-form-btn">
+            <button class="login100-form-btn" name = "submit" value = "changeHeader">
+                Update The Header
+            </button>
+        </div>
+    </form>
+<div>
+
+
+
+{%endblock%} <!-- Full block ends-->
+
+
+
