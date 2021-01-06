@@ -2,31 +2,30 @@
 {% block title%} Make Invoice {%endblock%}
 
 {% block content%}
-{%include "toolbar.html" %}
+{%include "widgets/toolbar.html" %}
+
 <div class = "wrap-all-modules">
-    <div class = "row row_container_child">
-      {%include "message_flashing.html" %}
-    </div>
     
-    
+    {%include "message_flashing.html" %}
+
     {% if isClientSelected == False %}
-      <div class = "row justify-content-center align-items-center"  >
-        {%include "set_client.html" %}
-      </div>
+      
+      {%include "widgets/set_client.html" %}
+      
     {% endif %}
 
     {% if isClientSelected == True %}
       
           <div>
-            {%include "find_products.html" %}
+            {%include "widgets/find_products.html" %}
           </div>
           <!-- Add a new product Form -->
           <div >
-            {%include "add_products.html" %}
+            {%include "widgets/add_products.html" %}
           </div>
       
       <div class = "row">
-        {%include "list_of_items.html" %}
+        {%include "widgets/list_of_items.html" %}
       </div>
     {% endif %}
 

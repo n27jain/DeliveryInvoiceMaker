@@ -16,7 +16,14 @@ class Item:
         
 
 class WordMaker:
-    def __init__(self, clientName, fileName, itemList, taxPercent):
+    def __init__(self, clientName, fileName, itemList, taxPercent,
+        companyName = "2293984 ONTARIO INC.",
+        address = "147 Clarence Street, Unit#30, Brampton, ON. L6W 1T2",
+        tel = "Tel: 905-497-6500",
+        fax = "Fax: 905-497-5600",
+        email = "E-mail: nathanpharmacy@gmail.com",
+        note = "Due to the ongoing Covid-19 crisis, supply chains, shipping times and raw materials have been drastically affected. All prices and shipping estimates and times are subject to change without prior notice. Because of the nature of our products, we have a no returns and refund policy."
+    ):
         self.taxPercent = taxPercent
         self.clientName = clientName
         self.itemList = itemList
@@ -24,12 +31,14 @@ class WordMaker:
         self.time = datetime.today()
         self.dateString = ""+ str( self.time.month) + "/"+ str( self.time.day) + "/" + str( self.time.year)
 
-        self.companyName = "2293984 ONTARIO INC."
-        self.address = "147 Clarence Street, Unit#30, Brampton, ON. L6W 1T2"
-        self.tel = "Tel: 905-497-6500"
-        self.fax = "Fax: 905-497-5600"
-        self.email = "E-mail: nathanpharmacy@gmail.com"
-        self.note = "Due to the ongoing Covid-19 crisis, supply chains, shipping times and raw materials have been drastically affected. All prices and shipping estimates and times are subject to change without prior notice. Because of the nature of our products, we have a no returns and refund policy."
+        #these vars are used to create the header
+        self.companyName = companyName  
+        self.address = address  
+        self.tel = tel 
+        self.fax = fax  
+        self.email = email
+        self.note = note 
+
         self.document = Document()
         self.section = self.document.sections[0]
 

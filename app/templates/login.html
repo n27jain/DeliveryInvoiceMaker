@@ -1,52 +1,36 @@
-<html>
-  <head>
-    <link rel="stylesheet" href = "{{ url_for('static', filename='css/login.css') }}" rel = "stylesheet">
-    <link rel="stylesheet" type="text/css" href = "{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" type="text/css" href = "{{ url_for('static', filename='fonts/font-awesome-4.7.0/css/font-awesome.min.css') }}">
-    <link rel="stylesheet" type="text/css" href = "{{ url_for('static', filename='vendor/animate/animate.css') }}">
-    <link rel="stylesheet" type="text/css" href = "{{ url_for('static', filename='vendor/css-hamburgers/hamburgers.min.css') }}">
-    <link rel="stylesheet" type="text/css" href = "{{ url_for('static', filename='vendor/select2/select2.min.css') }}">
-    <link rel="stylesheet" type="text/css" href = "{{ url_for('static', filename='css/util.css') }}">
-    <title>Login Page</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends 'base.html' %}
+{% block title%} Log In {%endblock%}
 
-  </head>
-  <body>
+{% block content%}
+<div class="limiter">
+	<div class="container-login100">
+		<div class="wrap-login100">
+			<div class="login100-pic js-tilt" data-tilt>
+				<img src = "/static/images/file_icon.png"  alt="IMG">
+			</div>
 
+			<form class="login100-form validate-form" action="" method="post">
+				
+				<span class="login100-form-title">
+					Login
+				</span>
 
-      
-
-    <div class="limiter">
-    
-		<div class="container-login100">
-      
-			<div class="wrap-login100">
-        
-				<div class="login100-pic js-tilt" data-tilt>
-					<img src = "/static/images/file_icon.png"  alt="IMG">
-				</div>
-
-				<form class="login100-form validate-form" action="" method="post">
-					
-          <span class="login100-form-title">
-						Login
-					</span>
-
-					<div class="wrap-input100 validate-input">
+				<div class="wrap-input100 validate-input">
 						
-            <input class="input100" type="text"placeholder="Username" name="username" value="{{request.form.username }}">
+					<input class="input100" type="text"placeholder="Username" name="username" value="{{request.form.username }}">
 
-						<span class="focus-input100"></span>
+						<span class="focus-input100">
+						</span>
 
 						<span class="symbol-input100">
 							<i class="fa fa-user" aria-hidden="true"></i>
-            </span>
+						</span>
 
-					</div>
+				</div>
 
 					<div class="wrap-input100 validate-input" data-validate = "Password is required">
-						<input class="input100" type="password" placeholder="Password" name="password" value="{{
-          request.form.password }}">
+						<input class="input100" type="password" placeholder="Password" name="password" 
+							value="{{request.form.password }}">
 						<span class="focus-input100"></span>
 						<span class="symbol-input100">
 							<i class="fa fa-lock" aria-hidden="true"></i>
@@ -55,22 +39,20 @@
 					
 					<div class="container-login100-form-btn">
 						<button class="login100-form-btn" type="submit" text="Login">
-              Login
-            </button>
+							Login
+						</button>
 					</div>
-          
-          {% if error %}
-            <p class="error"><strong>Error:</strong> {{ error }}
-          {% endif %}
+			
+				{% if error %}
+				<p class="error"><strong>Error:</strong> {{ error }}
+				{% endif %}
 
-				</form>
-          
-
-      
-
-			</div>
+			</form>
 		</div>
 	</div>
+</div>
   
-  </body>
-</html>
+
+{%endblock%} <!-- Full block ends-->
+
+
