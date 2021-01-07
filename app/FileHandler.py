@@ -10,11 +10,8 @@ class FileHandler:
         self.taxPercent = taxPercent
 
         self.header = header
-
         self.time = datetime.today()
-        print("Testing data : ", clientName, itemsList, taxPercent, self.time)
-
-        self.dateString = ""+ str( self.time.month) + "/"+ str( self.time.day) + "/" + str( self.time.year)
+        self.dateString = ""+ str(self.time.month) + "/"+ str(self.time.day) + "/" + str( self.time.year)
 
         self.clientFileName = self.clientName + str(self.time)
         self.personalFile = "PERSONAL_" + self.clientName + str(self.time)
@@ -40,5 +37,4 @@ class FileHandler:
         zip.write(self.excelFileName);
         zip.write(self.wordFileName)
         zip.close()
-        print("excelFileName wordFileName",self.excelFileName, self.wordFileName )
         return ( self.clientFileName + ".zip")

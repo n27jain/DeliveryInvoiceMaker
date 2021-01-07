@@ -29,6 +29,7 @@ firebaseConfig = {
 # global variables
 firebase = pyrebase.initialize_app(firebaseConfig)
 db = firebase.database()
+storage = firebase.storage()
 
 data = None
 itemsList = []
@@ -66,10 +67,14 @@ def login():
 
 @app.route("/home", methods=['GET', 'POST'])
 def home():
+
+    
+
+
+
     # global clientName
     global itemsList
     global foundData
-    
     clientName = None
     if "clientName" in session:
         
@@ -139,7 +144,6 @@ def home():
                 newCostPrice = float(newCostPrice)
                 addNewSalesPrice = float(addNewSalesPrice)
                 newQuantity = float(newQuantity)
-                print("EXAMINE : ", newCostPrice)
                 thisItem = None
                 hasChanged = False
 
@@ -157,21 +161,17 @@ def home():
                     else:
                         if newName and newName != thisItem.name :
                             thisItem.name = newName
-                            print("Changed because of name : ")
                             hasChanged = True
                         if newCostPrice and newCostPrice != thisItem.costPrice:
                             thisItem.costPrice = newCostPrice
                             hasChanged = True
-                            print("Changed because of costprice : ")
                         if addNewSalesPrice and addNewSalesPrice != thisItem.previousSalePrice[-1]:
                             thisItem.previousSalePrice.append(addNewSalesPrice) 
                             hasChanged = True
-                            print("Changed because of salesprice : ")
                         if newQuantity and newQuantity != thisItem.quantity:
                             #TODO: Throw error if new Quantity is 0 
                             thisItem.quantity = newQuantity
                             hasChanged = True
-                            print("Changed because of quantity : ")
 
                         itemsList.append(thisItem) # add this to the list of items in the invoice
                         if(hasChanged):
@@ -219,7 +219,7 @@ def changeClient():
 
 @app.route("/changeHeader", methods=['GET', 'POST'])
 def changeHeader():
-    print(session["companyName"])
+    
     if request.method == 'POST':
         if(request.form['submit'] == 'changeHeader'):
             companyNameF = request.form["companyName"]
@@ -277,7 +277,6 @@ def logout():
 @app.route('/return-files')
 def returnFiles():
     global itemsList
-    print("Testing data : ", itemsList)
     try:
         if len(itemsList) <= 0:
             flash("The itemList was found to contain no items")
@@ -289,18 +288,22 @@ def returnFiles():
             session['companyFax'],
             session['companyEmail'],
             session['companyNote'])
+            clientName = session['clientName']
 
-            ziped = FileHandler(session['clientName'], itemsList, taxPercent, header)
+            ziped = FileHandler(clientName, itemsList, taxPercent, header)
             
             file = ziped.addToZip()
+            
+            print("TESTING : ", os.path.dirname(os.path.abspath(file)))
+
             os.remove(ziped.excelFileName)
             os.remove(ziped.wordFileName)
             # os.remove(file)
 
-
-
             itemsList = []
             response = make_response(send_file(file, file, as_attachment=True))
+            storage.child("files/"+clientName + "/"+ file ).put(os.path.dirname(os.path.abspath(file)) + "/app/"+ file)
+            
 
             # remove cache for the file so that a new file can be sent each time
             response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
