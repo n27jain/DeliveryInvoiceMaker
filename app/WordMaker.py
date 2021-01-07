@@ -4,19 +4,13 @@ from docx.shared import Inches
 from docx.shared import Pt
 from datetime import datetime
 from .Item import Item
+from .Header import Header
 import math
 
 from .config import config      
 
 class WordMaker:
-    def __init__(self, clientName, fileName, itemList, taxPercent,
-        companyName = config["companyName"] ,
-        address = config["companyAddress"],
-        tel = "Tel: " +  str(config["companyTel"]),
-        fax = "Fax: "  +  str(config["companyFax"]),
-        email = "E-mail: " +  str(config["companyEmail"]),
-        note = config["companyNote"]
-    ):
+    def __init__(self, clientName, fileName, itemList, taxPercent, header):
         self.taxPercent = taxPercent
         self.clientName = clientName
         self.itemList = itemList
@@ -25,12 +19,18 @@ class WordMaker:
         self.dateString = ""+ str( self.time.month) + "/"+ str( self.time.day) + "/" + str( self.time.year)
 
         #these vars are used to create the header
-        self.companyName = companyName  
-        self.address = address  
-        self.tel = tel 
-        self.fax = fax  
-        self.email = email
-        self.note = note 
+        self.companyName = header.companyName if header.companyName else config.companyName
+        self.address = header.companyAddress  if header.companyAddress else config.companyAddress
+
+        tel = header.companyTel if header.companyTel else config.companyTel
+        fax = header.companyFax  if header.companyFax else config.companyFax
+        email = header.companyEmail if header.companyEmail else config.companyEmail
+        
+        self.tel = "Tel: " + str(tel)
+        self.fax = "Fax: " + str(fax)
+        self.email = "E-mail: " + str(email)
+
+        self.note = header.companyNote if header.companyNote else config.companyNote
 
         self.document = Document()
         self.section = self.document.sections[0]

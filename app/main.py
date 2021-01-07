@@ -2,6 +2,7 @@
 from .FileHandler import FileHandler
 from .Item import Item
 from .config import config
+from .Header import Header
 from flask import Flask 
 from flask import flash
 from flask import send_file
@@ -42,7 +43,13 @@ def stream_handler(message):
     print(message["path"]) # /-K7yGTTEp7O549EzTYtI
     print(message["data"]) 
 
-
+def setHeaderToDefault():
+    session['companyName'] = config["companyName"]  
+    session['companyAddress'] = config["companyAddress"]
+    session['companyTel'] = config["companyTel"]
+    session['companyFax'] = config["companyFax"]
+    session['companyEmail'] = config["companyEmail"]
+    session['companyNote'] = config["companyNote"]
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -51,13 +58,7 @@ def login():
         if request.form['username'] != 'admin' or request.form['password'] != 'admin':
             error = 'Invalid Credentials. Please try again.'
         else:
-            
-            session['companyName'] = config["companyName"]  
-            session['companyAddress'] = config["companyAddress"]
-            session['companyTel'] = config["companyTel"]
-            session['companyFax'] = config["companyFax"]
-            session['companyEmail'] = config["companyEmail"]
-            session['companyNote'] = config["companyNote"]
+            setHeaderToDefault()
             return redirect(url_for('changeClient'))
     # if "username" in session:
 
@@ -244,6 +245,18 @@ def changeHeader():
                 return redirect(url_for('home'))
             else: 
                 flash('Missing some required parameters!')
+        elif (request.form['submit'] == "restoreDefault"):
+            setHeaderToDefault()
+            return render_template('headerUpdatePage.html',
+                companyName = session['companyName'],
+                companyAddress = session['companyAddress'],
+                companyTel = session['companyTel'],
+                companyFax = session['companyFax'],
+                companyEmail = session['companyEmail'],
+                companyNote = session['companyNote']
+            )
+
+
     else:
         return render_template('headerUpdatePage.html',
             companyName = session['companyName'],
@@ -270,12 +283,22 @@ def returnFiles():
             flash("The itemList was found to contain no items")
         else:
             taxPercent = 0.13
-            ziped = FileHandler(session['clientName'], itemsList, taxPercent)
+            header = Header (session['companyName'], 
+            session['companyAddress'], 
+            session['companyTel'], 
+            session['companyFax'],
+            session['companyEmail'],
+            session['companyNote'])
+
+            ziped = FileHandler(session['clientName'], itemsList, taxPercent, header)
             
             file = ziped.addToZip()
             os.remove(ziped.excelFileName)
             os.remove(ziped.wordFileName)
             # os.remove(file)
+
+
+
             itemsList = []
             response = make_response(send_file(file, file, as_attachment=True))
 
