@@ -51,14 +51,14 @@ def login():
         if request.form['username'] != 'admin' or request.form['password'] != 'admin':
             error = 'Invalid Credentials. Please try again.'
         else:
-            global companyName, companyAddress , companyTel, companyFax, companyEmail
+            
             session['companyName'] = config["companyName"]  
             session['companyAddress'] = config["companyAddress"]
             session['companyTel'] = config["companyTel"]
             session['companyFax'] = config["companyFax"]
             session['companyEmail'] = config["companyEmail"]
             session['companyNote'] = config["companyNote"]
-            return redirect(url_for('home'))
+            return redirect(url_for('changeClient'))
     # if "username" in session:
 
     return render_template('login.html', error=error)
@@ -92,9 +92,9 @@ def home():
 
 
                 if name != '' and costPrice != '' and salesPrice != '' and quantity != '':
-                    costPrice = int(costPrice)
-                    salesPrice = int(salesPrice)
-                    quantity = int(quantity)
+                    costPrice = float(costPrice)
+                    salesPrice = float(salesPrice)
+                    quantity = float(quantity)
                 
                     #optional 
                     notes = None
@@ -135,10 +135,10 @@ def home():
             if( not(itemUpdateKey and newName and newCostPrice and addNewSalesPrice and newQuantity)):
                 flash("There are some missing parameters")
             else:
-                newCostPrice = int(newCostPrice)
-                addNewSalesPrice = int(addNewSalesPrice)
-                newQuantity = int(newQuantity)
-
+                newCostPrice = float(newCostPrice)
+                addNewSalesPrice = float(addNewSalesPrice)
+                newQuantity = float(newQuantity)
+                print("EXAMINE : ", newCostPrice)
                 thisItem = None
                 hasChanged = False
 
@@ -277,7 +277,6 @@ def returnFiles():
             os.remove(ziped.wordFileName)
             # os.remove(file)
             itemsList = []
-            session['clientName'] = None
             response = make_response(send_file(file, file, as_attachment=True))
 
             # remove cache for the file so that a new file can be sent each time
