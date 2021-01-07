@@ -293,8 +293,6 @@ def returnFiles():
             ziped = FileHandler(clientName, itemsList, taxPercent, header)
             
             file = ziped.addToZip()
-            
-            print("TESTING : ", os.path.dirname(os.path.abspath(file)))
 
             os.remove(ziped.excelFileName)
             os.remove(ziped.wordFileName)
