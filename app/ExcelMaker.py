@@ -34,9 +34,9 @@ class ExcelMaker:
             i = 1
             for item in self.items:
                 worksheet.write(i + 1, 0, item.name )
-                worksheet.write(i + 1, 1, item.previousSalePrice )
+                worksheet.write(i + 1, 1, item.previousSalePrice[-1] )
                 worksheet.write(i + 1, 2, item.quantity )
-                worksheet.write(i + 1, 3, item.quantity * item.previousSalePrice  )
+                worksheet.write(i + 1, 3, item.quantity * item.previousSalePrice[-1]  )
                 i += 1   
             
             worksheet.write(i + 1, 0, "Sub Total" )

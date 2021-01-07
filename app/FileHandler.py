@@ -4,10 +4,12 @@ from .ExcelMaker import ExcelMaker
 from .WordMaker import WordMaker
 
 class FileHandler:
-    def __init__(self, clientName, itemsList, taxPercent):
+    def __init__(self, clientName, itemsList, taxPercent, header):
         self.clientName = clientName
         self.itemsList = itemsList
         self.taxPercent = taxPercent
+
+        self.header = header
 
         self.time = datetime.today()
         print("Testing data : ", clientName, itemsList, taxPercent, self.time)
@@ -29,7 +31,8 @@ class FileHandler:
         wordFile = WordMaker(clientName = self.clientName, 
         fileName = self.clientFileName, 
         itemList = self.itemsList, 
-        taxPercent = self.taxPercent )
+        taxPercent = self.taxPercent,
+        header = self.header)
         return wordFile.save()
 
     def addToZip(self):

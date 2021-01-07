@@ -3,27 +3,14 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Inches
 from docx.shared import Pt
 from datetime import datetime
+from .Item import Item
+from .Header import Header
 import math
 
-class Item:
-    def __init__(self, key, name, costPrice, previousSalePrice , notes, quantity):
-        self.key = key
-        self.name = name
-        self.costPrice = costPrice
-        self.previousSalePrice = previousSalePrice
-        self.notes = notes
-        self.quantity = quantity
-        
+from .config import config      
 
 class WordMaker:
-    def __init__(self, clientName, fileName, itemList, taxPercent,
-        companyName = "2293984 ONTARIO INC.",
-        address = "147 Clarence Street, Unit#30, Brampton, ON. L6W 1T2",
-        tel = "Tel: 905-497-6500",
-        fax = "Fax: 905-497-5600",
-        email = "E-mail: nathanpharmacy@gmail.com",
-        note = "Due to the ongoing Covid-19 crisis, supply chains, shipping times and raw materials have been drastically affected. All prices and shipping estimates and times are subject to change without prior notice. Because of the nature of our products, we have a no returns and refund policy."
-    ):
+    def __init__(self, clientName, fileName, itemList, taxPercent, header):
         self.taxPercent = taxPercent
         self.clientName = clientName
         self.itemList = itemList
@@ -32,12 +19,18 @@ class WordMaker:
         self.dateString = ""+ str( self.time.month) + "/"+ str( self.time.day) + "/" + str( self.time.year)
 
         #these vars are used to create the header
-        self.companyName = companyName  
-        self.address = address  
-        self.tel = tel 
-        self.fax = fax  
-        self.email = email
-        self.note = note 
+        self.companyName = header.companyName if header.companyName else config.companyName
+        self.address = header.companyAddress  if header.companyAddress else config.companyAddress
+
+        tel = header.companyTel if header.companyTel else config.companyTel
+        fax = header.companyFax  if header.companyFax else config.companyFax
+        email = header.companyEmail if header.companyEmail else config.companyEmail
+        
+        self.tel = "Tel: " + str(tel)
+        self.fax = "Fax: " + str(fax)
+        self.email = "E-mail: " + str(email)
+
+        self.note = header.companyNote if header.companyNote else config.companyNote
 
         self.document = Document()
         self.section = self.document.sections[0]
@@ -45,7 +38,10 @@ class WordMaker:
         self.makeHeader()
         self.makeData()
         self.makeFooter()
-
+    def currencyFormat(self, value):
+        value = float(value)
+        return "${:,.2f}".format(value)
+        
     def makeHeader(self):
         header = self.section.header
         l1 = header.add_paragraph(self.companyName)
@@ -95,8 +91,7 @@ class WordMaker:
         l2.paragraph_format.space_before = Pt(0)
         l2.paragraph_format.space_after = Pt(0)
 
-    def roundup(self, var):
-        return (math.ceil(var / 100.0)) * 100
+    
 
     def makeTable(self):
         rowCount = len(self.itemList) + 5
@@ -134,17 +129,17 @@ class WordMaker:
         subtotal = 0
         i = 1
         for item in self.itemList:
-            amount = item.previousSalePrice * item.quantity
+            amount = item.previousSalePrice[-1] * item.quantity
             subtotal += amount
             cell = table.cell(i,0)
             cell.text = str(item.name)
             cell = table.cell(i,1)
-            cell.text = str(item.previousSalePrice)
+            cell.text = str(self.currencyFormat(item.previousSalePrice[-1]))
             cell = table.cell(i,2)
             cell.text = str(item.quantity)
            
             cell = table.cell(i,3)
-            cell.text = str(amount)
+            cell.text = str(self.currencyFormat(amount))
             i += 1
 
         hst = (0.13 * subtotal)
@@ -163,7 +158,7 @@ class WordMaker:
         row = table.rows[i+1]
         cell = row.cells[3]
 
-        cell.text = str(subtotal)
+        cell.text = self.currencyFormat(str(subtotal))
 
         row = table.rows[i+2]
         cell = row.cells[0]
@@ -175,7 +170,7 @@ class WordMaker:
 
         row = table.rows[i+2]
         cell = row.cells[3]
-        cell.text = str(hst)
+        cell.text = self.currencyFormat(str(hst))
 
         row = table.rows[i+3]
         cell = row.cells[0]
@@ -187,7 +182,7 @@ class WordMaker:
 
         row = table.rows[i+3]
         cell = row.cells[3]
-        cell.text = str(total)
+        cell.text = self.currencyFormat(str(total))
     
     def save(self):
         self.document.save("app/"+ self.fileName + ".docx")

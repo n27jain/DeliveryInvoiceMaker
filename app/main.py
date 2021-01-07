@@ -1,6 +1,8 @@
 
 from .FileHandler import FileHandler
 from .Item import Item
+from .config import config
+from .Header import Header
 from flask import Flask 
 from flask import flash
 from flask import send_file
@@ -9,26 +11,24 @@ from flask import request, make_response
 from flask import session
 
 
-
 import re
 import os
 import pyrebase
 
 firebaseConfig = {
-    "apiKey": "AIzaSyDjRLpE5kpL82vkQbJB9wRJC6mP1iR6o7w",
-    "authDomain": "invoices-d12ae.firebaseapp.com",
-    "databaseURL": "https://invoices-d12ae.firebaseio.com",
-    "projectId": "invoices-d12ae",
-    "storageBucket": "invoices-d12ae.appspot.com",
-    "messagingSenderId": "741972661830",
-    "appId": "1:741972661830:web:2a8ecdb51a559ce5881c47",
-    "measurementId": "G-7BKRLPKX63"
+    "apiKey": config["apiKey"],
+    "authDomain": config["authDomain"],
+    "databaseURL": config["databaseURL"],
+    "projectId": config["projectId"],
+    "storageBucket": config["storageBucket"],
+    "messagingSenderId": config["messagingSenderId"],
+    "appId": config["appId"],
+    "measurementId": config["measurementId"]
 }
 
 # global variables
 firebase = pyrebase.initialize_app(firebaseConfig)
 db = firebase.database()
-
 
 data = None
 itemsList = []
@@ -36,15 +36,20 @@ foundData = [] # this is data found that is searched
 fileName = ""
 
 app = Flask(__name__)
-app.secret_key = "projectSecretKey"
+app.secret_key = config["secret_key"]
 
 def stream_handler(message):
     print(message["event"]) # put
     print(message["path"]) # /-K7yGTTEp7O549EzTYtI
     print(message["data"]) 
 
-
-
+def setHeaderToDefault():
+    session['companyName'] = config["companyName"]  
+    session['companyAddress'] = config["companyAddress"]
+    session['companyTel'] = config["companyTel"]
+    session['companyFax'] = config["companyFax"]
+    session['companyEmail'] = config["companyEmail"]
+    session['companyNote'] = config["companyNote"]
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -53,7 +58,8 @@ def login():
         if request.form['username'] != 'admin' or request.form['password'] != 'admin':
             error = 'Invalid Credentials. Please try again.'
         else:
-            return redirect(url_for('home'))
+            setHeaderToDefault()
+            return redirect(url_for('changeClient'))
     # if "username" in session:
 
     return render_template('login.html', error=error)
@@ -76,7 +82,6 @@ def home():
     if request.method == 'POST':
         if (request.form['submit'] == 'add'):
             #mandatory
-            # TODO: check with db to make sure name does not exist already 
             name = request.form["nm"]
             searchDB = searchItems(name, isExact = True)
             if(searchDB): # we found a copy
@@ -88,9 +93,9 @@ def home():
 
 
                 if name != '' and costPrice != '' and salesPrice != '' and quantity != '':
-                    costPrice = int(costPrice)
-                    salesPrice = int(salesPrice)
-                    quantity = int(quantity)
+                    costPrice = float(costPrice)
+                    salesPrice = float(salesPrice)
+                    quantity = float(quantity)
                 
                     #optional 
                     notes = None
@@ -114,12 +119,8 @@ def home():
                 else:
                     flash("Invaild Item")
 
-            return render_template('main.html', data = data , 
-            itemsList = itemsList, 
-             
-            clientName = session['clientName'] )
-            # return redirect( url_for("itemPage") )
-
+            return render_template('main.html', data = data , itemsList = itemsList, clientName = session['clientName'] )
+            
         elif (request.form['submit'] == 'find'):
             findnm = request.form["findnm"]
             foundData = searchItems(findnm)
@@ -135,10 +136,10 @@ def home():
             if( not(itemUpdateKey and newName and newCostPrice and addNewSalesPrice and newQuantity)):
                 flash("There are some missing parameters")
             else:
-                newCostPrice = int(newCostPrice)
-                addNewSalesPrice = int(addNewSalesPrice)
-                newQuantity = int(newQuantity)
-
+                newCostPrice = float(newCostPrice)
+                addNewSalesPrice = float(addNewSalesPrice)
+                newQuantity = float(newQuantity)
+                print("EXAMINE : ", newCostPrice)
                 thisItem = None
                 hasChanged = False
 
@@ -190,15 +191,10 @@ def home():
         
         elif(request.form['submit'] == 'updateClientName'):
             itemsList = []
-            check = request.form["cname"]
-            if(check and check != "" and isValidFileName(check)):
-                clientName = request.form["cname"]
-                session['clientName'] = request.form["cname"]
+            if "clientName" in session:
+                session.pop("clientName")
 
-                isClientSelected = True
-            else:
-                flash('Invalid Filename: ' + check)
-            return render_template('main.html', data = data, itemsList = itemsList,  clientName = clientName )
+            return redirect(url_for('changeClient'))
 
         else:
             return render_template('main.html', data = data, itemsList = itemsList,  clientName = clientName  )
@@ -208,10 +204,6 @@ def home():
 
 @app.route("/changeClient", methods=['GET', 'POST'])
 def changeClient():
-    if "clientName" in session:
-        
-        if(session['clientName'] != None  or session['clientName'] != ""):
-            return redirect(url_for('home'))
     if request.method == 'POST':
         if(request.form['submit'] == 'updateClientName'):
             global itemsList # empty the global list of items TODO: Make this in session as well
@@ -225,8 +217,57 @@ def changeClient():
 
     return render_template('choseClientPage.html')
 
+@app.route("/changeHeader", methods=['GET', 'POST'])
+def changeHeader():
+    print(session["companyName"])
+    if request.method == 'POST':
+        if(request.form['submit'] == 'changeHeader'):
+            companyNameF = request.form["companyName"]
+            companyAddressF = request.form["companyAddress"]
+            companyTelF = request.form["companyTel"]
+            companyFaxF = request.form["companyFax"]
+            companyEmailF = request.form["companyEmail"]
+            companyNoteF = request.form["companyNote"]
+            if(companyNameF 
+                and companyAddressF and companyAddressF != ""
+                and companyTelF and companyTelF != ""
+                and companyFaxF and companyFaxF != ""
+                and companyEmailF and companyEmailF != ""):
+                session['companyName'] = companyNameF  
+                session['companyAddress'] = companyAddressF
+                session['companyTel'] = companyTelF
+                session['companyFax'] = companyFaxF
+                session['companyEmail'] = companyEmailF
+                if(companyNoteF and companyNoteF != ""):
+                    session['companyNote'] = companyNoteF
+                else:
+                    session['companyNote'] = ""
+                return redirect(url_for('home'))
+            else: 
+                flash('Missing some required parameters!')
+        elif (request.form['submit'] == "restoreDefault"):
+            setHeaderToDefault()
+            return render_template('headerUpdatePage.html',
+                companyName = session['companyName'],
+                companyAddress = session['companyAddress'],
+                companyTel = session['companyTel'],
+                companyFax = session['companyFax'],
+                companyEmail = session['companyEmail'],
+                companyNote = session['companyNote']
+            )
 
 
+    else:
+        return render_template('headerUpdatePage.html',
+            companyName = session['companyName'],
+            companyAddress = session['companyAddress'],
+            companyTel = session['companyTel'],
+            companyFax = session['companyFax'],
+            companyEmail = session['companyEmail'],
+            companyNote = session['companyNote']
+            )
+            
+            
 
 @app.route("/logout")
 def logout():
@@ -234,7 +275,7 @@ def logout():
     return redirect(url_for("login"))
 
 @app.route('/return-files')
-def creareturn_files_tut():
+def returnFiles():
     global itemsList
     print("Testing data : ", itemsList)
     try:
@@ -242,14 +283,23 @@ def creareturn_files_tut():
             flash("The itemList was found to contain no items")
         else:
             taxPercent = 0.13
-            ziped = FileHandler(session['clientName'], itemsList, taxPercent)
+            header = Header (session['companyName'], 
+            session['companyAddress'], 
+            session['companyTel'], 
+            session['companyFax'],
+            session['companyEmail'],
+            session['companyNote'])
+
+            ziped = FileHandler(session['clientName'], itemsList, taxPercent, header)
             
             file = ziped.addToZip()
             os.remove(ziped.excelFileName)
             os.remove(ziped.wordFileName)
             # os.remove(file)
+
+
+
             itemsList = []
-            session['clientName'] = None
             response = make_response(send_file(file, file, as_attachment=True))
 
             # remove cache for the file so that a new file can be sent each time
@@ -261,14 +311,9 @@ def creareturn_files_tut():
             return response
         # return out
     except Exception as e:
+        print(e)
         return str(e)
 
-@app.route('/change-client')
-def resetClientName():
-    #reset clientName
-
-    session.pop("clientName", None)
-    return redirect(url_for('home'))
     
 def isValidFileName(name):
     if all(x.isalpha() or x.isspace() or x.isnumeric() for x in name):
