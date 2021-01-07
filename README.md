@@ -7,7 +7,7 @@ A web app that can store products and their details on a database and allow user
 ## How to run
 
  1. in the app/ directory create a config.py file. 
-  *This is needed for you to host your own firebase database. In main.py from .config import config this is the imported file that contains your*
+  *This is needed for you to host your own firebase database. In main.py from .config import config this is the imported file that contains your config parameters*
   
  2. Copy, Paste, and fill parameters from app/config_example.py into app/config.py file then you may delete app/config_example.py 
  
