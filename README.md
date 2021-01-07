@@ -1,3 +1,4 @@
+
 DeliveryInvoiceMaker
 **Last Update:** 01/07/2021
 
@@ -27,13 +28,14 @@ The overall objective for making this app was to quickly and efficiently learn p
 
 ## Project API's and Technologies:
 
-- [VS Code] (IDE)
-- [Python, Html, CSS] (Programing Language)
-- [Firebase](https://firebase.google.com)(Database)
-- [xlsxwriter](https://xlsxwriter.readthedocs.io/)](Library) used for making excel file
-- [python-docx] (Library) used for making word document with details
-  -[pyrebase] (Firebase Wrapper) This is a beautiful wrapper for using the Firebase API. Made queries suer easy
-
+- [VS Code](https://code.visualstudio.com/)  (IDE)
+- Python, Html, CSS, Javascript (Programing Languages /Scripts)
+- [Firebase](https://firebase.google.com) (Database)
+- [Flask](https://flask.palletsprojects.com/) (Web App Library)
+- [xlsxwriter](https://xlsxwriter.readthedocs.io/)(Library) used for making excel file
+- [python-docx](https://python-docx.readthedocs.io) (Library) used for making word document with details
+ - [pyrebase](https://github.com/thisbejim/Pyrebase)  (Firebase Wrapper) This is a beautiful wrapper for using the Firebase API. Made queries suer easy
+- All other dependencies used can be found in the requirements.txt
 ## Features
 
 ## Problems
