@@ -9,8 +9,8 @@ A web app that can store products and their details on a database and allow user
 
 1. in the app/ directory create a config.py file.*This is needed for you to host your own firebase database. In main.py from .config import config this is the imported file that contains your config parameters*
 2. Copy, Paste, and fill parameters from app/config_example.py into app/config.py file then you may delete app/config_example.py
-3. Create a virtual enviroment
-4. Once inside the envioment run`pip3 install -r requirements.txt`*This will install all of the required packages*
+3. Create a virtual environment
+4. Once inside the environment run`pip3 install -r requirements.txt`*This will install all of the required packages*
 5. now in the root directory you may launch the app by running`gunicorn wsgi:app`*Keep in mind gunicorn must be installed for this app to run properly on the correct port*
 
 ## Product demo :
