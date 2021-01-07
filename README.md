@@ -6,6 +6,9 @@ DeliveryInvoiceMaker
 
 A web app that can store products and their details on a database and allow users to access those items to automatically create invoices and receipts in pdf format. Users can track the previous sales price and quantity used as well as have details ready in regards to use.
 
+## Video
+[Click Me](https://youtu.be/IZl-iTN-k4g)
+
 ## How to run
 
 1. in the app/ directory create a config.py file.*This is needed for you to host your own firebase database. In main.py from .config import config this is the imported file that contains your config parameters*
@@ -35,7 +38,6 @@ The overall objective for making this app was to quickly and efficiently learn p
 - [python-docx](https://python-docx.readthedocs.io) (Library) used for making word document with details
  - [pyrebase](https://github.com/thisbejim/Pyrebase)  (Firebase Wrapper) This is a beautiful wrapper for using the Firebase API. Made queries suer easy
 
-## Features
 
 ## Problems
 
