@@ -10,7 +10,6 @@ from flask import render_template, redirect, url_for
 from flask import request, make_response
 from flask import session
 
-
 import re
 import os
 import pyrebase
@@ -40,8 +39,8 @@ app = Flask(__name__)
 app.secret_key = config["secret_key"]
 
 def stream_handler(message):
-    print(message["event"]) # put
-    print(message["path"]) # /-K7yGTTEp7O549EzTYtI
+    print(message["event"]) 
+    print(message["path"])
     print(message["data"]) 
 
 def setHeaderToDefault():
@@ -61,18 +60,12 @@ def login():
         else:
             setHeaderToDefault()
             return redirect(url_for('changeClient'))
-    # if "username" in session:
 
     return render_template('login.html', error=error)
 
 @app.route("/home", methods=['GET', 'POST'])
 def home():
 
-    
-
-
-
-    # global clientName
     global itemsList
     global foundData
     clientName = None
@@ -278,7 +271,7 @@ def logout():
 def returnFiles():
     global itemsList
     try:
-        if len(itemsList) <= 0:
+        if not itemsList or len(itemsList) <= 0:
             flash("The itemList was found to contain no items")
         else:
             taxPercent = 0.13
@@ -298,7 +291,6 @@ def returnFiles():
             os.remove(ziped.wordFileName)
             # os.remove(file)
 
-            itemsList = []
             response = make_response(send_file(file, file, as_attachment=True))
             storage.child("files/"+clientName + "/"+ file ).put(os.path.dirname(os.path.abspath(file)) + "/app/"+ file)
             
@@ -326,11 +318,9 @@ def getData():
     global data
     data = None
     data = db.child("Products").get()
-    # print(data)
 
 def searchItems(query, isExact = False):
     getData()
-    # parsing = re.search('te', "TEST", re.IGNORECASE)
     
     listToShare = [] # this list contains all found products and their details
     temp_name = None
@@ -357,9 +347,6 @@ def searchItems(query, isExact = False):
 
                 temp_salesPrice = (i.val()["previousSalePrice"])
                 temp_quantity = i.val()["quantity"]
-                #notes = "Previous Sales Prices Were: " + str(i.val()["previousSalePrice"])
-                # if i.val()["notes"]:
-                #     notes = notes + " / " + i.val()["notes"]
 
                 key = i.key()
                 jsonVal = Item(key, temp_name, temp_costPrice, temp_salesPrice, i.val()["notes"], temp_quantity) # include the old note to prevent the temp note from overwriting
