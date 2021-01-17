@@ -30,9 +30,7 @@ Since I am a shareholder of the company I made the decision to make this open-so
 The overall objective for making this app was to quickly and efficiently learn python and flask to be able to host web apps for hackathons and personal projects.
 
 ## Project API's and Technologies:
-
-- [VS Code](https://code.visualstudio.com/)  (IDE)
-- [Python, Html, CSS] (Programing Language)
+- [Python, Html, CSS] (Programing Language / Scripts)
 - [Firebase](https://firebase.google.com)(Database)
 - [xlsxwriter](https://xlsxwriter.readthedocs.io/)(Library) used for making excel file
 - [python-docx](https://python-docx.readthedocs.io) (Library) used for making word document with details
